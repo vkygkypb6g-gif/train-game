@@ -3,16 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#090b0d" />
+  <meta name="theme-color" content="#0b100d" />
   <meta name="description" content="Pick a railway track, dodge the train, and cash out with fake money." />
   <title>Tunnels</title>
+  <!-- tunnels-v2-mole -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='18' r='10' fill='%236b4a3a'/%3E%3Ccircle cx='16' cy='12' r='7' fill='%23805a48'/%3E%3Ccircle cx='16' cy='13' r='3' fill='%23f4a8b8'/%3E%3C/svg%3E" />
   <style>
     :root {
-      --bg: #090b0d;
-      --bg-2: #10141a;
-      --panel: #161a20;
-      --panel-2: #1c222a;
-      --line: rgba(180, 196, 212, 0.16);
+      --bg: #0b100d;
+      --bg-2: #121a14;
+      --panel: #172017;
+      --panel-2: #1d281e;
+      --line: rgba(180, 210, 170, 0.16);
       --brass: #d4a25a;
       --brass-hi: #f3dfb3;
       --brass-dim: #8a6a3a;
@@ -21,16 +23,14 @@
       --go: #3ecf7a;
       --go-dim: #1e7a44;
       --stop: #e24a3b;
-      --cream: #eef1f4;
-      --muted: #8b939c;
-      --steel: #8a949e;
+      --cream: #eef3ea;
+      --muted: #8b9a8c;
       --danger: #ff6b5a;
       --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
       --font-ui: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
       --font-num: "SF Mono", "Cascadia Mono", "Consolas", "Liberation Mono", ui-monospace, monospace;
       --safe-bottom: env(safe-area-inset-bottom, 0px);
       --safe-top: env(safe-area-inset-top, 0px);
-      --tracks: 4;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -51,7 +51,7 @@
       position: fixed;
       inset: 0;
       z-index: 80;
-      opacity: 0.09;
+      opacity: 0.08;
       mix-blend-mode: overlay;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.85'/%3E%3C/svg%3E");
     }
@@ -97,7 +97,7 @@
       flex-shrink: 0;
     }
     .balance {
-      background: linear-gradient(180deg, #242a32, #14181e);
+      background: linear-gradient(180deg, #243028, #141c16);
       border: 1px solid var(--line);
       border-radius: 999px;
       padding: 8px 14px;
@@ -113,7 +113,7 @@
     .icon-btn, .text-btn {
       height: 38px;
       border: 1px solid var(--line);
-      background: #14181e;
+      background: #141c16;
       border-radius: 10px;
       color: var(--brass);
       display: grid;
@@ -123,27 +123,25 @@
     }
     .text-btn { font-size: 0.72rem; letter-spacing: 0.12em; font-weight: 700; text-transform: uppercase; }
     .icon-btn { width: 38px; }
-    .icon-btn:hover, .text-btn:hover { background: #242a32; color: var(--brass-hi); border-color: var(--brass-dim); }
+    .icon-btn:hover, .text-btn:hover { background: #243028; color: var(--brass-hi); border-color: var(--brass-dim); }
     .icon-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
     .stage {
       flex: 1;
       display: grid;
-      grid-template-columns: minmax(260px, 48%) 1fr;
+      grid-template-columns: minmax(260px, 52%) 1fr;
       gap: 18px;
       min-height: 0;
     }
 
     .yard-panel {
       position: relative;
-      background:
-        linear-gradient(180deg, rgba(212,162,90,0.06), transparent 18%),
-        var(--bg-2);
+      background: var(--bg-2);
       border: 1px solid var(--line);
       border-radius: 22px;
       overflow: hidden;
       box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,0.02);
-      min-height: 460px;
+      min-height: 500px;
       display: flex;
       flex-direction: column;
     }
@@ -156,9 +154,9 @@
       font-size: 0.64rem;
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: var(--brass-dim);
-      background: rgba(9,11,13,0.72);
-      border: 1px solid var(--line);
+      color: #3d5a30;
+      background: rgba(236, 240, 210, 0.82);
+      border: 1px solid rgba(80, 90, 40, 0.2);
       padding: 4px 10px;
       border-radius: 999px;
       backdrop-filter: blur(6px);
@@ -169,466 +167,149 @@
       position: relative;
       flex: 1;
       overflow: hidden;
-      background:
-        radial-gradient(ellipse at 50% -8%, #1c2836 0%, transparent 48%),
-        linear-gradient(180deg, #0b1016 0 42%, #161410 42%, #12100c 100%);
+      touch-action: manipulation;
+      background: #7eb3d9;
     }
-    .sky {
-      position: absolute;
-      left: 0; right: 0; top: 0;
-      height: 46%;
-      pointer-events: none;
-      background-image:
-        radial-gradient(1px 1px at 8% 22%, rgba(255,255,255,0.7), transparent),
-        radial-gradient(1.2px 1.2px at 18% 40%, rgba(255,255,255,0.45), transparent),
-        radial-gradient(1px 1px at 28% 16%, rgba(255,255,255,0.6), transparent),
-        radial-gradient(1px 1px at 42% 30%, rgba(255,255,255,0.35), transparent),
-        radial-gradient(1.4px 1.4px at 58% 12%, rgba(255,255,255,0.7), transparent),
-        radial-gradient(1px 1px at 70% 28%, rgba(255,255,255,0.4), transparent),
-        radial-gradient(1px 1px at 82% 18%, rgba(255,255,255,0.55), transparent),
-        radial-gradient(1.2px 1.2px at 90% 36%, rgba(255,255,255,0.35), transparent);
-    }
-    .moon {
-      position: absolute;
-      top: 16px;
-      right: 22px;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 32%, #f6efe2, #c9b894);
-      box-shadow: 0 0 28px rgba(243,234,220,0.28);
-      z-index: 1;
-      pointer-events: none;
-    }
-    .hill {
-      position: absolute;
-      left: -6%;
-      right: -6%;
-      top: 8%;
-      height: 40%;
-      background: linear-gradient(180deg, #2c343c 0 10%, #1a2026 10% 100%);
-      border-radius: 46% 46% 0 0 / 16% 16% 0 0;
-      box-shadow: inset 0 10px 0 rgba(255,255,255,0.03), 0 -8px 30px rgba(0,0,0,0.25);
-      z-index: 2;
-    }
-    .hill::before {
-      content: "";
+    .scene-art {
       position: absolute;
       inset: 0;
-      background:
-        repeating-linear-gradient(90deg, transparent 0 17px, rgba(0,0,0,0.12) 17px 18px),
-        repeating-linear-gradient(0deg, transparent 0 11px, rgba(255,255,255,0.015) 11px 12px);
-      border-radius: inherit;
-      opacity: 0.7;
-      pointer-events: none;
-    }
-    .tunnels {
-      position: absolute;
-      left: 6%;
-      right: 6%;
-      top: 16%;
-      height: 34%;
-      display: grid;
-      grid-template-columns: repeat(var(--tracks), 1fr);
-      align-items: end;
-      z-index: 4;
-      pointer-events: none;
-    }
-    .tunnel {
-      position: relative;
+      width: 100%;
       height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
+      display: block;
+      pointer-events: none;
+      z-index: 1;
     }
-    .signal {
-      width: 11px;
-      height: 11px;
-      border-radius: 50%;
-      background: #2a261c;
-      box-shadow: 0 0 0 3px #161310, 0 0 6px rgba(240,164,58,0.08);
-      margin-bottom: 7px;
-      z-index: 2;
-    }
-    .signal.is-amber {
-      background: #f0a43a;
-      box-shadow: 0 0 0 3px #161310, 0 0 14px rgba(240,164,58,0.85);
-    }
-    .signal.is-red {
-      background: #ff4d3d;
-      box-shadow: 0 0 0 3px #161310, 0 0 16px rgba(255,77,61,0.9);
-    }
-    .signal.is-green {
-      background: #3ecf7a;
-      box-shadow: 0 0 0 3px #161310, 0 0 14px rgba(62,207,122,0.85);
-    }
-    .app.is-rumble .signal { animation: signalFlicker 0.16s steps(2) infinite; }
-    .arch {
-      width: min(84%, 102px);
-      aspect-ratio: 3 / 3.55;
-      position: relative;
-      background: linear-gradient(180deg, #5a5248, #3a342c 28%, #221e18);
-      border-radius: 50% 50% 4px 4px / 64% 64% 4px 4px;
-      box-shadow: 0 0 0 3px #3a342c, 0 0 0 6px #14110d, inset 0 -8px 16px rgba(0,0,0,0.5);
-      overflow: hidden;
-      margin-bottom: -6px;
-    }
-    .mouth {
+
+    .hits {
       position: absolute;
-      left: 11%;
-      right: 11%;
-      top: 13%;
-      bottom: -2px;
-      background: radial-gradient(ellipse at 50% 100%, #1c140c 0%, #070605 58%);
-      border-radius: 50% 50% 0 0 / 72% 72% 0 0;
-      box-shadow: inset 0 10px 16px rgba(0,0,0,0.55);
+      inset: 0;
+      z-index: 6;
     }
-    .tunnel.is-chosen .arch {
-      box-shadow: 0 0 0 3px #3a3020, 0 0 0 5px #d4a25a, 0 0 18px rgba(212,162,90,0.35), inset 0 -8px 16px rgba(0,0,0,0.5);
-    }
-    .tunnel-num {
+    .hit {
       position: absolute;
-      left: 50%;
-      bottom: 8px;
-      transform: translateX(-50%);
-      font-family: var(--font-num);
-      font-size: 0.62rem;
-      letter-spacing: 0.08em;
-      color: #6a6258;
-      z-index: 2;
-    }
-    .ground {
-      position: absolute;
-      left: 0; right: 0;
-      top: 48%;
-      bottom: 0;
-      background:
-        repeating-linear-gradient(90deg, transparent 0 13px, rgba(0,0,0,0.14) 13px 14px),
-        linear-gradient(180deg, #2c281e 0, #1c1913 28%, #14110d 100%);
-      box-shadow: inset 0 16px 22px rgba(0,0,0,0.35);
-      z-index: 3;
-    }
-    .platform {
-      position: absolute;
-      left: 0; right: 0;
-      bottom: 0;
-      height: 22px;
-      background: linear-gradient(180deg, #3a3428, #221e18);
-      border-top: 1px solid rgba(212,162,90,0.18);
-      z-index: 4;
-    }
-    .lanes {
-      position: absolute;
-      left: 6%;
-      right: 6%;
-      top: 0;
-      bottom: 0;
-      display: grid;
-      grid-template-columns: repeat(var(--tracks), 1fr);
-      z-index: 5;
-    }
-    .lane {
-      position: relative;
+      inset: 0;
+      width: 100%;
       height: 100%;
-      background: none;
+      background: transparent;
       border: 0;
-      color: inherit;
+      padding: 0;
       opacity: 1;
-      border-radius: 0;
+      cursor: default;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      clip-path: polygon(var(--poly));
     }
-    .lane:disabled { opacity: 1; cursor: default; }
-    .app.is-pick .lane { cursor: pointer; }
-    .app.is-pick .lane:hover .rail,
-    .app.is-pick .lane:focus-visible .rail { filter: drop-shadow(0 0 8px rgba(240,164,58,0.4)); }
-    .rail {
+    .app.is-pick .hit { cursor: pointer; }
+    .app.is-pick .hit:hover { background: rgba(255, 207, 106, 0.10); }
+    .app.is-pick .hit:focus-visible { background: rgba(255, 207, 106, 0.16); outline: none; }
+    .hit.is-chosen { background: rgba(255, 207, 106, 0.12); }
+    .hit.is-danger { background: rgba(255, 77, 61, 0.10); }
+    .hit.is-safe { background: rgba(62, 207, 122, 0.08); }
+    .hit:disabled { opacity: 1; cursor: default; }
+
+    .badge {
       position: absolute;
-      top: 0;
-      bottom: 22px;
-      left: 50%;
-      width: 32px;
-      margin-left: -16px;
-      background:
-        repeating-linear-gradient(180deg, #5a4630 0 6px, transparent 6px 15px),
-        linear-gradient(90deg, transparent 0 5px, #9aa3ac 5px 8px, transparent 8px 24px, #9aa3ac 24px 27px, transparent 27px);
-      opacity: 0.92;
+      z-index: 7;
       pointer-events: none;
-    }
-    .lane.is-chosen .rail { filter: drop-shadow(0 0 10px rgba(240,164,58,0.55)); }
-    .lane.is-danger .rail { filter: drop-shadow(0 0 10px rgba(255,77,61,0.5)); }
-    .lane.is-safe .rail { filter: drop-shadow(0 0 8px rgba(62,207,122,0.4)); }
-    .lane-hint {
-      position: absolute;
-      left: 50%;
-      top: 10px;
-      transform: translateX(-50%);
+      width: 28px;
+      height: 28px;
+      margin-left: 0;
+      border-radius: 50%;
+      background: #f4efe0;
+      color: #1a1812;
       font-family: var(--font-num);
-      font-size: 0.68rem;
-      color: var(--muted);
-      background: rgba(9,11,13,0.55);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 1px 7px;
-      pointer-events: none;
-      opacity: 0;
+      font-weight: 800;
+      font-size: 0.95rem;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 2px 0 #c4b898, 0 6px 12px rgba(0,0,0,0.28);
+      border: 2px solid #2a2418;
     }
-    .app.is-pick .lane-hint { opacity: 0.9; }
+    .app.is-pick .badge { animation: badgePulse 1.2s ease-in-out infinite; }
+    .hit.is-chosen + .badge,
+    .badge.is-chosen {
+      background: var(--led);
+      box-shadow: 0 2px 0 #c48a20, 0 0 16px rgba(255,176,46,0.65);
+    }
+
+    .actor-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .mole {
+      position: absolute;
+      width: 86px;
+      height: 86px;
+      margin-left: -43px;
+      margin-top: -62px;
+      z-index: 8;
+      transition: left 0.38s cubic-bezier(0.22, 0.8, 0.28, 1), top 0.38s cubic-bezier(0.22, 0.8, 0.28, 1);
+      filter: drop-shadow(0 10px 6px rgba(0,0,0,0.35));
+    }
+    .mole svg { width: 100%; height: 100%; display: block; overflow: visible; }
+    .app.is-commit .mole { animation: moleWalk 0.38s ease; }
+    .app.is-safe .mole { animation: moleHop 0.48s ease; }
+    .app.is-hit .mole { animation: moleYeet 0.95s cubic-bezier(0.2, 0.7, 0.35, 1) forwards; }
+    .app.is-hit .mole .eyes-ok { display: none; }
+    .app.is-hit .mole .eyes-hit { display: block !important; }
+    .app.is-hit .mole .stars { opacity: 1; }
+    .mole .eyes-hit { display: none; }
+    .mole .stars { opacity: 0; transform-origin: 43px 20px; }
+    .app.is-hit .mole .stars { animation: orbit 0.7s linear infinite; }
 
     .train {
       position: absolute;
-      left: 50%;
-      top: -28%;
-      width: 42px;
-      margin-left: -21px;
+      width: 70px;
+      height: 80px;
+      margin-left: -35px;
+      margin-top: -50px;
       z-index: 6;
       opacity: 0;
+      transform: scale(0.32);
+      transform-origin: 50% 70%;
+      filter: drop-shadow(0 10px 8px rgba(0,0,0,0.4));
+    }
+    .train svg { width: 100%; height: 100%; display: block; overflow: visible; }
+    .train.is-bursting { animation: trainIn 0.7s cubic-bezier(0.18, 0.7, 0.22, 1) forwards; }
+    .train.is-passing { animation: trainPass 0.85s cubic-bezier(0.2, 0.7, 0.3, 1) forwards; }
+    .train.is-impact { animation: trainHit 0.7s cubic-bezier(0.2, 0.5, 0.2, 1) forwards; }
+
+    .pick-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 10px;
+      transform: translateX(-50%);
+      z-index: 9;
       pointer-events: none;
-      transform: translateY(0) scale(0.38);
-      filter: drop-shadow(0 8px 10px rgba(0,0,0,0.45));
-    }
-    .lane.is-bursting .train { animation: trainBurst 0.7s cubic-bezier(0.18, 0.7, 0.22, 1) forwards; }
-    .lane.is-passing .train { animation: trainPass 0.85s cubic-bezier(0.2, 0.7, 0.3, 1) forwards; }
-    .lane.is-impact .train { animation: trainHit 0.7s cubic-bezier(0.2, 0.5, 0.2, 1) forwards; }
-    .train .glow {
-      position: absolute;
-      left: 50%;
-      top: 38%;
-      width: 90px;
-      height: 90px;
-      margin-left: -45px;
-      margin-top: -30px;
-      background: radial-gradient(circle, rgba(255, 220, 140, 0.75), rgba(255,176,46,0.15) 42%, transparent 68%);
-      z-index: 0;
-    }
-    .train .body { position: relative; z-index: 1; width: 42px; }
-    .train .chimney {
-      width: 10px;
-      height: 12px;
-      margin: 0 auto 1px;
-      background: linear-gradient(180deg, #2a2420, #0e0c0a);
-      border-radius: 2px 2px 0 0;
-      box-shadow: 0 -6px 8px rgba(160,160,160,0.25);
-    }
-    .train .cabin {
-      width: 28px;
-      height: 16px;
-      margin: 0 auto;
-      background: linear-gradient(180deg, #3a342c, #1a1612);
-      border-radius: 3px 3px 0 0;
-      box-shadow: inset 0 0 0 1px #2a261e;
-      position: relative;
-    }
-    .train .cabin::after {
-      content: "";
-      position: absolute;
-      left: 6px; right: 6px; top: 4px;
-      height: 6px;
-      background: #f0c46a;
-      opacity: 0.7;
-      border-radius: 1px;
-    }
-    .train .boiler {
-      width: 38px;
-      height: 28px;
-      margin: 0 auto;
-      background: linear-gradient(180deg, #4a443c, #1c1914);
-      border-radius: 8px 8px 6px 6px;
-      box-shadow: inset 0 0 0 1px #2e2a24, inset 0 8px 8px rgba(255,255,255,0.05);
-      position: relative;
-    }
-    .train .lamp {
-      position: absolute;
-      left: 50%;
-      top: 8px;
-      width: 16px;
-      height: 16px;
-      margin-left: -8px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 40% 35%, #fff6d6, #ffb02e 55%, #c47d28);
-      box-shadow: 0 0 16px rgba(255, 200, 80, 0.95);
-    }
-    .train .cow {
-      width: 0;
-      height: 0;
-      margin: -2px auto 0;
-      border-left: 16px solid transparent;
-      border-right: 16px solid transparent;
-      border-top: 10px solid #2a2420;
-    }
-    .hero {
-      position: absolute;
-      bottom: 18px;
-      left: 50%;
-      width: 46px;
-      height: 90px;
-      margin-left: -23px;
-      z-index: 7;
-      transition: left 0.35s cubic-bezier(0.22, 0.8, 0.28, 1);
-      pointer-events: none;
-    }
-    .hero-shadow {
-      position: absolute;
-      left: 50%;
-      bottom: 4px;
-      width: 28px;
-      height: 8px;
-      margin-left: -14px;
-      background: rgba(0,0,0,0.4);
-      border-radius: 50%;
-      filter: blur(1px);
-    }
-    .hero-fig { position: absolute; inset: 0; transform-origin: 50% 90%; }
-    .hero .cap {
-      position: absolute;
-      left: 50%;
-      top: 2px;
-      width: 22px;
-      height: 8px;
-      margin-left: -11px;
-      background: #2a3a4a;
-      border-radius: 6px 6px 1px 1px;
-      z-index: 2;
-    }
-    .hero .cap::after {
-      content: "";
-      position: absolute;
-      left: -4px;
-      bottom: 0;
-      width: 10px;
-      height: 3px;
-      background: #1a2430;
-      border-radius: 2px;
-    }
-    .hero .head {
-      position: absolute;
-      left: 50%;
-      top: 8px;
-      width: 22px;
-      height: 22px;
-      margin-left: -11px;
-      background: #e8c8a0;
-      border-radius: 50%;
-      z-index: 1;
-      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.08);
-    }
-    .hero .eye {
-      position: absolute;
-      top: 9px;
-      width: 4px;
-      height: 4px;
-      background: #1a1612;
-      border-radius: 50%;
-    }
-    .hero .eye.l { left: 5px; }
-    .hero .eye.r { right: 5px; }
-    .hero .mouth {
-      position: absolute;
-      left: 50%;
-      bottom: 5px;
-      width: 6px;
-      height: 3px;
-      margin-left: -3px;
-      border-bottom: 2px solid #8a5a40;
-      border-radius: 0 0 6px 6px;
-    }
-    .hero .torso {
-      position: absolute;
-      left: 50%;
-      top: 30px;
-      width: 20px;
-      height: 24px;
-      margin-left: -10px;
-      background: linear-gradient(180deg, #3d6a8a, #2a4a62);
-      border-radius: 6px 6px 4px 4px;
-    }
-    .hero .arm {
-      position: absolute;
-      top: 32px;
-      width: 6px;
-      height: 20px;
-      background: #2a4a62;
-      border-radius: 3px;
-    }
-    .hero .arm.l { left: 8px; transform: rotate(8deg); }
-    .hero .arm.r { right: 8px; transform: rotate(-8deg); }
-    .hero .leg {
-      position: absolute;
-      top: 52px;
-      width: 7px;
-      height: 24px;
-      background: #2a261e;
-      border-radius: 0 0 3px 3px;
-    }
-    .hero .leg.l { left: 14px; }
-    .hero .leg.r { right: 14px; }
-    .hero .boot {
-      position: absolute;
-      bottom: -3px;
-      left: -2px;
-      width: 11px;
-      height: 5px;
-      background: #1a1612;
-      border-radius: 2px;
-    }
-    .hero .stars {
-      position: absolute;
-      left: 50%;
-      top: -6px;
-      width: 40px;
-      height: 40px;
-      margin-left: -20px;
+      background: rgba(11, 16, 13, 0.78);
+      color: var(--brass-hi);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
       opacity: 0;
-      pointer-events: none;
+      white-space: nowrap;
     }
-    .hero .stars span {
-      position: absolute;
-      color: var(--led);
-      font-size: 12px;
-      text-shadow: 0 0 8px rgba(255,207,106,0.8);
-    }
-    .hero .stars span:nth-child(1) { left: 2px; top: 8px; }
-    .hero .stars span:nth-child(2) { right: 0; top: 2px; }
-    .hero .stars span:nth-child(3) { left: 14px; top: -4px; }
-    .app.is-commit .hero-fig { animation: walkBob 0.35s ease; }
-    .app.is-safe .hero-fig { animation: hop 0.48s ease; }
-    .app.is-hit .hero-fig { animation: yeet 0.9s cubic-bezier(0.2, 0.7, 0.35, 1) forwards; }
-    .app.is-hit .hero .eye {
-      width: 6px;
-      height: 6px;
-      background: transparent;
-      border-radius: 0;
-    }
-    .app.is-hit .hero .eye.l,
-    .app.is-hit .hero .eye.r {
-      background:
-        linear-gradient(45deg, transparent 44%, #1a1612 44% 56%, transparent 56%),
-        linear-gradient(-45deg, transparent 44%, #1a1612 44% 56%, transparent 56%);
-    }
-    .app.is-hit .hero .mouth {
-      width: 8px;
-      height: 8px;
-      margin-left: -4px;
-      bottom: 3px;
-      border: 2px solid #8a5a40;
-      border-radius: 50%;
-      background: #3a2018;
-    }
-    .app.is-hit .hero .stars { opacity: 1; animation: orbit 0.7s linear infinite; }
-    .app.is-rumble .yard-panel { animation: shake 0.16s linear infinite; }
-    .app.is-hit .yard-panel { animation: impact 0.45s ease-out; }
-    .app.is-burst .yard-panel { animation: shake 0.12s linear infinite; }
+    .app.is-pick .pick-hint { opacity: 1; animation: pulse 1.2s ease-in-out infinite; }
+
     .vignette {
       pointer-events: none;
       position: absolute;
       inset: 0;
-      z-index: 7;
-      box-shadow: inset 0 0 80px rgba(0,0,0,0.45);
+      z-index: 4;
+      box-shadow: inset 0 0 80px rgba(0,0,0,0.28);
     }
     .flash {
       pointer-events: none;
       position: absolute;
       inset: 0;
-      z-index: 8;
+      z-index: 10;
       opacity: 0;
     }
     .app.is-hit .flash {
@@ -644,7 +325,7 @@
       left: 50%;
       top: 42%;
       transform: translate(-50%, -50%);
-      z-index: 9;
+      z-index: 11;
       opacity: 0;
       pointer-events: none;
       font-weight: 800;
@@ -660,12 +341,12 @@
       left: 50%;
       bottom: 18px;
       transform: translateX(-50%);
-      z-index: 10;
+      z-index: 12;
       min-width: 200px;
       text-align: center;
       padding: 10px 16px;
       border-radius: 12px;
-      background: rgba(9, 11, 13, 0.88);
+      background: rgba(11, 16, 13, 0.88);
       border: 1px solid var(--line);
       display: none;
       letter-spacing: 0.08em;
@@ -676,9 +357,14 @@
     .result-pop.win { color: var(--go); border-color: rgba(62, 207, 122, 0.35); }
     .result-pop.lose { color: var(--danger); border-color: rgba(226, 74, 59, 0.35); }
 
+    .app.is-rumble .yard-panel { animation: shake 0.16s linear infinite; }
+    .app.is-burst .yard-panel { animation: shake 0.12s linear infinite; }
+    .app.is-hit .yard-panel { animation: impact 0.45s ease-out; }
+    .app.is-rumble .signal-lamp { animation: signalFlicker 0.16s steps(2) infinite; }
+
     .dash { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
     .display {
-      background: radial-gradient(ellipse at 50% 0%, #2a2418, #10141a 55%);
+      background: radial-gradient(ellipse at 50% 0%, #2a2818, #121a14 55%);
       border: 1px solid var(--line);
       border-radius: 22px;
       padding: 18px 18px 16px;
@@ -769,7 +455,7 @@
     .auto-row input {
       width: 72px;
       height: 34px;
-      background: #10141a;
+      background: #101610;
       border: 1px solid var(--line);
       border-radius: 8px;
       color: var(--cream);
@@ -797,12 +483,12 @@
     .history ul { list-style: none; }
     .history li {
       display: grid;
-      grid-template-columns: 3.2rem 3.6rem 3.2rem 1fr 1fr;
+      grid-template-columns: 3.2rem 3.2rem 1fr 1fr;
       gap: 6px;
       font-family: var(--font-num);
       font-size: 0.75rem;
       padding: 6px 0;
-      border-top: 1px solid rgba(180,196,212,0.1);
+      border-top: 1px solid rgba(180,210,170,0.1);
       color: var(--muted);
     }
     .history li .res-cash { color: var(--go); }
@@ -827,7 +513,7 @@
     .bet-input {
       width: 110px;
       height: 42px;
-      background: #10141a;
+      background: #101610;
       border: 1px solid var(--line);
       border-radius: 10px;
       color: var(--led);
@@ -843,7 +529,7 @@
       padding: 0 11px;
       border-radius: 999px;
       border: 1px solid var(--line);
-      background: #12161c;
+      background: #121816;
       color: var(--brass-hi);
       font-size: 0.78rem;
       letter-spacing: 0.06em;
@@ -851,8 +537,6 @@
     }
     .chip:hover:not(:disabled) { border-color: var(--brass); background: #242018; }
     .chip.is-on { background: #3a2c18; border-color: var(--brass); color: var(--led); }
-    .track-picker { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .track-picker .bet-label { margin-right: 2px; }
     .odds-hint { width: 100%; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.04em; }
     .start-btn {
       margin-left: auto;
@@ -881,7 +565,7 @@
       position: fixed;
       inset: 0;
       z-index: 40;
-      background: rgba(6, 5, 4, 0.72);
+      background: rgba(6, 8, 6, 0.72);
       display: none;
       place-items: center;
       padding: 24px;
@@ -889,7 +573,7 @@
     .overlay.show { display: grid; }
     .modal {
       width: min(420px, 100%);
-      background: linear-gradient(180deg, #242a32, #12161c);
+      background: linear-gradient(180deg, #243028, #121816);
       border: 1px solid var(--line);
       border-radius: 20px;
       padding: 28px 24px;
@@ -901,45 +585,48 @@
     .modal .start-btn { width: 100%; margin-left: 0; }
 
     @keyframes signalFlicker {
-      0%, 100% { filter: brightness(1.15); }
+      0%, 100% { filter: brightness(1.2); }
       50% { filter: brightness(0.35); }
     }
-    @keyframes trainBurst {
-      0% { opacity: 1; transform: translateY(0) scale(0.38); }
-      100% { opacity: 1; transform: translateY(58%) scale(1.05); }
+    @keyframes badgePulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.08); }
+    }
+    @keyframes trainIn {
+      0% { opacity: 1; }
+      100% { opacity: 1; }
     }
     @keyframes trainPass {
-      0% { opacity: 1; transform: translateY(0) scale(0.38); }
-      55% { opacity: 1; transform: translateY(70%) scale(1.15); }
-      100% { opacity: 0; transform: translateY(145%) scale(1.4); }
+      0% { opacity: 1; }
+      85% { opacity: 1; }
+      100% { opacity: 0; }
     }
     @keyframes trainHit {
-      0% { opacity: 1; transform: translateY(0) scale(0.38); }
-      70% { opacity: 1; transform: translateY(52%) scale(1.2); }
-      82% { transform: translateY(48%) scale(1.28) rotate(-4deg); }
-      100% { opacity: 1; transform: translateY(50%) scale(1.18) rotate(2deg); }
+      0% { opacity: 1; }
+      100% { opacity: 1; }
     }
-    @keyframes walkBob {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
+    @keyframes moleWalk {
+      0%, 100% { transform: translateY(0) rotate(0); }
+      25% { transform: translateY(-5px) rotate(-4deg); }
+      75% { transform: translateY(-3px) rotate(4deg); }
     }
-    @keyframes hop {
+    @keyframes moleHop {
       0%, 100% { transform: translateY(0) scale(1); }
-      40% { transform: translateY(-14px) scale(1.04); }
+      40% { transform: translateY(-16px) scale(1.06); }
       70% { transform: translateY(2px) scale(0.98); }
     }
-    @keyframes yeet {
-      0% { transform: translateY(0) rotate(0); }
-      28% { transform: translateY(-92px) rotate(-28deg) scale(1.06); }
-      55% { transform: translateY(-64px) rotate(18deg); }
-      82% { transform: translateY(8px) rotate(-10deg); }
-      100% { transform: translateY(10px) rotate(-14deg); }
+    @keyframes moleYeet {
+      0% { transform: translateY(0) rotate(0) scale(1); }
+      28% { transform: translateY(-110px) rotate(-32deg) scale(1.08); }
+      55% { transform: translateY(-70px) rotate(18deg); }
+      82% { transform: translateY(8px) rotate(-12deg); }
+      100% { transform: translateY(12px) rotate(-16deg); }
     }
     @keyframes orbit {
       0% { transform: rotate(0); }
       100% { transform: rotate(360deg); }
     }
-    @keyframes pulse { 50% { opacity: 0.45; } }
+    @keyframes pulse { 50% { opacity: 0.55; } }
     @keyframes cashPulse {
       0%, 100% { box-shadow: 0 8px 24px rgba(201, 163, 107, 0.25), inset 0 1px 0 rgba(255,255,255,0.4); }
       50% { box-shadow: 0 8px 32px rgba(255, 176, 46, 0.55), inset 0 1px 0 rgba(255,255,255,0.4); }
@@ -966,21 +653,26 @@
     }
 
     @media (max-width: 800px) {
-      .wrap { padding: calc(10px + var(--safe-top)) 12px calc(12px + var(--safe-bottom)); gap: 12px; }
+      .wrap { padding: calc(10px + var(--safe-top)) 12px calc(12px + var(--safe-bottom)); gap: 10px; }
       header.top { flex-wrap: wrap; }
       .brand { width: 100%; }
       .logo { letter-spacing: 0.34em; text-indent: 0.34em; }
       .tag { white-space: normal; }
       .top-right { margin-left: auto; }
-      .stage { grid-template-columns: 1fr; }
-      .yard-panel { min-height: 0; height: 44vh; height: 44dvh; }
-      .bet-bar { padding: 12px; }
+      .stage, .dash { display: contents; }
+      .yard-panel { order: 1; min-height: 0; height: 48vh; height: 48dvh; }
+      .display { order: 2; }
+      .metrics { order: 3; }
+      .cashout { order: 4; height: 56px; }
+      .bet-bar { order: 5; padding: 12px; }
+      .auto-row { order: 6; }
+      .history { order: 7; min-height: 0; }
+      .help { order: 8; }
       .start-btn { width: 100%; margin-left: 0; }
-      .chips, .track-picker { width: 100%; }
-      .history { min-height: 0; }
-      .history li { grid-template-columns: 2.4rem 3.2rem 2.8rem 1fr 1fr; font-size: 0.7rem; }
-      .cashout { height: 58px; position: sticky; bottom: 0; }
-      .arch { width: min(86%, 70px); }
+      .chips { width: 100%; }
+      .history li { grid-template-columns: 2.4rem 3.2rem 1fr 1fr; font-size: 0.7rem; }
+      .badge { width: 24px; height: 24px; font-size: 0.82rem; }
+      .mole { width: 70px; height: 70px; margin-left: -35px; margin-top: -50px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1022,34 +714,239 @@
         <section class="yard-panel" aria-label="Railway tunnels">
           <div class="plaque">Stark Rail &middot; Zug</div>
           <div class="yard-view" id="yardView">
-            <div class="sky" aria-hidden="true"></div>
-            <div class="moon" aria-hidden="true"></div>
-            <div class="hill" aria-hidden="true"></div>
-            <div class="tunnels" id="tunnels"></div>
-            <div class="ground">
-              <div class="lanes" id="lanes"></div>
-              <div class="hero" id="hero">
-                <div class="hero-shadow"></div>
-                <div class="hero-fig">
-                  <div class="stars" aria-hidden="true"><span>&#10022;</span><span>&#10023;</span><span>&#10022;</span></div>
-                  <div class="cap"></div>
-                  <div class="head">
-                    <span class="eye l"></span>
-                    <span class="eye r"></span>
-                    <span class="mouth"></span>
-                  </div>
-                  <div class="arm l"></div>
-                  <div class="arm r"></div>
-                  <div class="torso"></div>
-                  <div class="leg l"><i class="boot"></i></div>
-                  <div class="leg r"><i class="boot"></i></div>
-                </div>
-              </div>
-              <div class="platform" aria-hidden="true"></div>
-            </div>
+            <svg class="scene-art" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#6ea8d4"/>
+            <stop offset="42%" stop-color="#b9d6ea"/>
+            <stop offset="72%" stop-color="#e7ddb0"/>
+            <stop offset="100%" stop-color="#c9b07a"/>
+          </linearGradient>
+          <linearGradient id="farHill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#6a9a62"/>
+            <stop offset="100%" stop-color="#3e6e48"/>
+          </linearGradient>
+          <linearGradient id="hill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#8fd45f"/>
+            <stop offset="35%" stop-color="#53a344"/>
+            <stop offset="100%" stop-color="#2d6b34"/>
+          </linearGradient>
+          <linearGradient id="hillSide" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="rgba(0,0,0,0.18)"/>
+            <stop offset="40%" stop-color="rgba(0,0,0,0)"/>
+            <stop offset="60%" stop-color="rgba(255,255,255,0.08)"/>
+            <stop offset="100%" stop-color="rgba(0,0,0,0.16)"/>
+          </linearGradient>
+          <linearGradient id="dirt" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#7a5230"/>
+            <stop offset="100%" stop-color="#4a3018"/>
+          </linearGradient>
+          <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#5c8a3e"/>
+            <stop offset="40%" stop-color="#6a8f44"/>
+            <stop offset="100%" stop-color="#3d6a32"/>
+          </linearGradient>
+          <radialGradient id="mouth" cx="50%" cy="40%" r="70%">
+            <stop offset="0%" stop-color="#3a2a1c"/>
+            <stop offset="70%" stop-color="#0c0a08"/>
+            <stop offset="100%" stop-color="#050403"/>
+          </radialGradient>
+          <radialGradient id="sunG" cx="38%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#fff4c8"/>
+            <stop offset="55%" stop-color="#ffd36a"/>
+            <stop offset="100%" stop-color="#f0a33a"/>
+          </radialGradient>
+          <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="6"/>
+          </filter>
+        </defs>
+        <rect width="1000" height="1000" fill="url(#sky)"/>
+        <circle cx="790" cy="128" r="70" fill="#ffe9a0" opacity="0.35" filter="url(#soft)"/>
+        <circle cx="790" cy="128" r="44" fill="url(#sunG)"/>
+        <ellipse cx="180" cy="150" rx="90" ry="28" fill="#fff" opacity="0.28"/>
+        <ellipse cx="230" cy="145" rx="60" ry="22" fill="#fff" opacity="0.22"/>
+        <ellipse cx="620" cy="110" rx="80" ry="22" fill="#fff" opacity="0.2"/>
+        <path d="M0 430 C 160 360, 280 400, 420 370 C 580 335, 720 400, 1000 350 L 1000 540 L 0 540 Z" fill="url(#farHill)" opacity="0.85"/>
+        <path d="M0 470 C 200 410, 360 445, 520 420 C 740 385, 880 450, 1000 430 L 1000 560 L 0 560 Z" fill="#3f7a45" opacity="0.7"/>
+        <rect x="-20" y="518" width="1040" height="500" fill="url(#ground)"/>
+                <polygon points="299.0,520 411.0,520 263.0,1000 37.0,1000" fill="url(#dirt)" />
+        <polygon points="444.0,520 556.0,520 618.0,1000 382.0,1000" fill="url(#dirt)" />
+        <polygon points="589.0,520 701.0,520 963.0,1000 737.0,1000" fill="url(#dirt)" />
+                  <line x1="283.9" y1="563.6" x2="388.8" y2="563.6" stroke="#6a4a28" stroke-width="5.9" stroke-linecap="round"/>
+          <line x1="260.0" y1="607.3" x2="375.4" y2="607.3" stroke="#6a4a28" stroke-width="6.8" stroke-linecap="round"/>
+          <line x1="236.1" y1="650.9" x2="362.1" y2="650.9" stroke="#6a4a28" stroke-width="7.7" stroke-linecap="round"/>
+          <line x1="212.1" y1="694.5" x2="348.8" y2="694.5" stroke="#6a4a28" stroke-width="8.6" stroke-linecap="round"/>
+          <line x1="188.2" y1="738.2" x2="335.4" y2="738.2" stroke="#6a4a28" stroke-width="9.5" stroke-linecap="round"/>
+          <line x1="164.3" y1="781.8" x2="322.1" y2="781.8" stroke="#6a4a28" stroke-width="10.5" stroke-linecap="round"/>
+          <line x1="140.3" y1="825.5" x2="308.8" y2="825.5" stroke="#6a4a28" stroke-width="11.4" stroke-linecap="round"/>
+          <line x1="116.4" y1="869.1" x2="295.4" y2="869.1" stroke="#6a4a28" stroke-width="12.3" stroke-linecap="round"/>
+          <line x1="92.5" y1="912.7" x2="282.1" y2="912.7" stroke="#6a4a28" stroke-width="13.2" stroke-linecap="round"/>
+          <line x1="68.5" y1="956.4" x2="268.7" y2="956.4" stroke="#6a4a28" stroke-width="14.1" stroke-linecap="round"/>
+          <line x1="447.0" y1="563.6" x2="553.0" y2="563.6" stroke="#6a4a28" stroke-width="5.9" stroke-linecap="round"/>
+          <line x1="441.2" y1="607.3" x2="558.8" y2="607.3" stroke="#6a4a28" stroke-width="6.8" stroke-linecap="round"/>
+          <line x1="435.3" y1="650.9" x2="564.7" y2="650.9" stroke="#6a4a28" stroke-width="7.7" stroke-linecap="round"/>
+          <line x1="429.4" y1="694.5" x2="570.6" y2="694.5" stroke="#6a4a28" stroke-width="8.6" stroke-linecap="round"/>
+          <line x1="423.6" y1="738.2" x2="576.4" y2="738.2" stroke="#6a4a28" stroke-width="9.5" stroke-linecap="round"/>
+          <line x1="417.7" y1="781.8" x2="582.3" y2="781.8" stroke="#6a4a28" stroke-width="10.5" stroke-linecap="round"/>
+          <line x1="411.8" y1="825.5" x2="588.2" y2="825.5" stroke="#6a4a28" stroke-width="11.4" stroke-linecap="round"/>
+          <line x1="406.0" y1="869.1" x2="594.0" y2="869.1" stroke="#6a4a28" stroke-width="12.3" stroke-linecap="round"/>
+          <line x1="400.1" y1="912.7" x2="599.9" y2="912.7" stroke="#6a4a28" stroke-width="13.2" stroke-linecap="round"/>
+          <line x1="394.3" y1="956.4" x2="605.7" y2="956.4" stroke="#6a4a28" stroke-width="14.1" stroke-linecap="round"/>
+          <line x1="611.2" y1="563.6" x2="716.1" y2="563.6" stroke="#6a4a28" stroke-width="5.9" stroke-linecap="round"/>
+          <line x1="624.6" y1="607.3" x2="740.0" y2="607.3" stroke="#6a4a28" stroke-width="6.8" stroke-linecap="round"/>
+          <line x1="637.9" y1="650.9" x2="763.9" y2="650.9" stroke="#6a4a28" stroke-width="7.7" stroke-linecap="round"/>
+          <line x1="651.2" y1="694.5" x2="787.9" y2="694.5" stroke="#6a4a28" stroke-width="8.6" stroke-linecap="round"/>
+          <line x1="664.6" y1="738.2" x2="811.8" y2="738.2" stroke="#6a4a28" stroke-width="9.5" stroke-linecap="round"/>
+          <line x1="677.9" y1="781.8" x2="835.7" y2="781.8" stroke="#6a4a28" stroke-width="10.5" stroke-linecap="round"/>
+          <line x1="691.2" y1="825.5" x2="859.7" y2="825.5" stroke="#6a4a28" stroke-width="11.4" stroke-linecap="round"/>
+          <line x1="704.6" y1="869.1" x2="883.6" y2="869.1" stroke="#6a4a28" stroke-width="12.3" stroke-linecap="round"/>
+          <line x1="717.9" y1="912.7" x2="907.5" y2="912.7" stroke="#6a4a28" stroke-width="13.2" stroke-linecap="round"/>
+          <line x1="731.3" y1="956.4" x2="931.5" y2="956.4" stroke="#6a4a28" stroke-width="14.1" stroke-linecap="round"/>
+                <line x1="317.0" y1="520.0" x2="65.0" y2="1000.0" stroke="#3a3f45" stroke-width="9" stroke-linecap="round"/>
+        <line x1="393.0" y1="520.0" x2="235.0" y2="1000.0" stroke="#3a3f45" stroke-width="9" stroke-linecap="round"/>
+        <line x1="462.0" y1="520.0" x2="410.0" y2="1000.0" stroke="#3a3f45" stroke-width="9" stroke-linecap="round"/>
+        <line x1="538.0" y1="520.0" x2="590.0" y2="1000.0" stroke="#3a3f45" stroke-width="9" stroke-linecap="round"/>
+        <line x1="607.0" y1="520.0" x2="765.0" y2="1000.0" stroke="#3a3f45" stroke-width="9" stroke-linecap="round"/>
+        <line x1="683.0" y1="520.0" x2="935.0" y2="1000.0" stroke="#3a3f45" stroke-width="9" stroke-linecap="round"/>
+                <line x1="317.0" y1="520.0" x2="65.0" y2="1000.0" stroke="#d5dbe1" stroke-width="4.2" stroke-linecap="round"/>
+        <line x1="393.0" y1="520.0" x2="235.0" y2="1000.0" stroke="#d5dbe1" stroke-width="4.2" stroke-linecap="round"/>
+        <line x1="462.0" y1="520.0" x2="410.0" y2="1000.0" stroke="#d5dbe1" stroke-width="4.2" stroke-linecap="round"/>
+        <line x1="538.0" y1="520.0" x2="590.0" y2="1000.0" stroke="#d5dbe1" stroke-width="4.2" stroke-linecap="round"/>
+        <line x1="607.0" y1="520.0" x2="765.0" y2="1000.0" stroke="#d5dbe1" stroke-width="4.2" stroke-linecap="round"/>
+        <line x1="683.0" y1="520.0" x2="935.0" y2="1000.0" stroke="#d5dbe1" stroke-width="4.2" stroke-linecap="round"/>
+        <path d="M-80 530 C 40 530, 160 300, 500 278 C 840 300, 960 530, 1080 530 L 1080 590 L -80 590 Z" fill="url(#hill)"/>
+        <path d="M-80 530 C 40 530, 160 300, 500 278 C 840 300, 960 530, 1080 530 L 1080 590 L -80 590 Z" fill="url(#hillSide)"/>
+        <!-- grass crest -->
+        <path d="M 120 430 l 8 -18 l 8 18 m 40 -8 l 7 -16 l 7 16 m 70 20 l 8 -14 l 6 14 m 200 -40 l 9 -18 l 8 18 m 50 10 l 6 -14 l 6 14 m 180 16 l 8 -16 l 8 16 m 60 -6 l 7 -15 l 7 15" stroke="#2f6a32" stroke-width="3" fill="none" stroke-linecap="round"/>
+        
+        <path d="M 307 522 L 307 430 Q 307 372 355 372 Q 403 372 403 430 L 403 522 Z M 321 522 L 321 434 Q 321 396 355 396 Q 389 396 389 434 L 389 522 Z" fill="#7a7164" fill-rule="evenodd" stroke="#3a342c" stroke-width="3"/>
+        <path d="M 321 522 L 321 434 Q 321 396 355 396 Q 389 396 389 434 L 389 522 Z" fill="url(#mouth)"/>
+        <rect x="353" y="348" width="4" height="22" rx="1" fill="#3a342c"/>
+        <circle class="signal-lamp" cx="355" cy="346" r="7" fill="#2a261c" stroke="#1a1812" stroke-width="2"/>
+        <circle class="signal-lamp" cx="355" cy="346" r="3.5" fill="#f0a43a" opacity="0.15"/>
+    
+        
+        <path d="M 452 522 L 452 430 Q 452 372 500 372 Q 548 372 548 430 L 548 522 Z M 466 522 L 466 434 Q 466 396 500 396 Q 534 396 534 434 L 534 522 Z" fill="#7a7164" fill-rule="evenodd" stroke="#3a342c" stroke-width="3"/>
+        <path d="M 466 522 L 466 434 Q 466 396 500 396 Q 534 396 534 434 L 534 522 Z" fill="url(#mouth)"/>
+        <rect x="498" y="348" width="4" height="22" rx="1" fill="#3a342c"/>
+        <circle class="signal-lamp" cx="500" cy="346" r="7" fill="#2a261c" stroke="#1a1812" stroke-width="2"/>
+        <circle class="signal-lamp" cx="500" cy="346" r="3.5" fill="#f0a43a" opacity="0.15"/>
+    
+        
+        <path d="M 597 522 L 597 430 Q 597 372 645 372 Q 693 372 693 430 L 693 522 Z M 611 522 L 611 434 Q 611 396 645 396 Q 679 396 679 434 L 679 522 Z" fill="#7a7164" fill-rule="evenodd" stroke="#3a342c" stroke-width="3"/>
+        <path d="M 611 522 L 611 434 Q 611 396 645 396 Q 679 396 679 434 L 679 522 Z" fill="url(#mouth)"/>
+        <rect x="643" y="348" width="4" height="22" rx="1" fill="#3a342c"/>
+        <circle class="signal-lamp" cx="645" cy="346" r="7" fill="#2a261c" stroke="#1a1812" stroke-width="2"/>
+        <circle class="signal-lamp" cx="645" cy="346" r="3.5" fill="#f0a43a" opacity="0.15"/>
+    
+        <!-- hill lip over track start -->
+        <path d="M 250 522 C 355 510, 355 510, 460 522" fill="none" stroke="#2d6b34" stroke-width="8" stroke-linecap="round"/>
+        <path d="M 395 522 C 500 510, 500 510, 605 522" fill="none" stroke="#2d6b34" stroke-width="8" stroke-linecap="round"/>
+        <path d="M 540 522 C 645 510, 645 510, 750 522" fill="none" stroke="#2d6b34" stroke-width="8" stroke-linecap="round"/>
+        <!-- foreground grass -->
+        <path d="M-20 1000 Q 80 860, 220 1000 Q 80 920, -20 1000 Z" fill="#2f6a32"/>
+        <path d="M 1020 1000 Q 920 850, 780 1000 Q 940 910, 1020 1000 Z" fill="#2f6a32"/>
+        <path d="M 0 1000 Q 40 930, 90 1000 M 40 1000 Q 70 920, 110 1000 M 900 1000 Q 940 915, 990 1000" stroke="#24582a" stroke-width="6" fill="none" stroke-linecap="round"/>
+      </svg>
             <div class="vignette"></div>
+            <div class="actor-layer">
+              <div class="train" id="train0" aria-hidden="true">
+                <svg viewBox="0 0 70 80">
+                  <ellipse cx="35" cy="72" rx="16" ry="5" fill="rgba(0,0,0,0.3)"/>
+                  <ellipse cx="35" cy="36" rx="34" ry="28" fill="#ffd27a" opacity="0.35"/>
+                  <rect x="22" y="8" width="10" height="12" rx="2" fill="#2a2420"/>
+                  <rect x="20" y="16" width="30" height="18" rx="3" fill="#3a342c"/>
+                  <rect x="26" y="20" width="18" height="8" rx="1" fill="#f0c46a" opacity="0.8"/>
+                  <ellipse cx="35" cy="48" rx="22" ry="18" fill="#4a443c"/>
+                  <ellipse cx="35" cy="48" rx="22" ry="18" fill="none" stroke="#2a261e" stroke-width="2"/>
+                  <circle cx="35" cy="48" r="9" fill="#fff3c8"/>
+                  <circle cx="35" cy="48" r="6" fill="#ffb02e"/>
+                  <circle cx="33" cy="46" r="2" fill="#fff" opacity="0.8"/>
+                  <path d="M18 64 L35 58 L52 64 L35 72 Z" fill="#2a2420"/>
+                </svg>
+              </div>
+              <div class="train" id="train1" aria-hidden="true">
+                <svg viewBox="0 0 70 80">
+                  <ellipse cx="35" cy="72" rx="16" ry="5" fill="rgba(0,0,0,0.3)"/>
+                  <ellipse cx="35" cy="36" rx="34" ry="28" fill="#ffd27a" opacity="0.35"/>
+                  <rect x="22" y="8" width="10" height="12" rx="2" fill="#2a2420"/>
+                  <rect x="20" y="16" width="30" height="18" rx="3" fill="#3a342c"/>
+                  <rect x="26" y="20" width="18" height="8" rx="1" fill="#f0c46a" opacity="0.8"/>
+                  <ellipse cx="35" cy="48" rx="22" ry="18" fill="#4a443c"/>
+                  <ellipse cx="35" cy="48" rx="22" ry="18" fill="none" stroke="#2a261e" stroke-width="2"/>
+                  <circle cx="35" cy="48" r="9" fill="#fff3c8"/>
+                  <circle cx="35" cy="48" r="6" fill="#ffb02e"/>
+                  <circle cx="33" cy="46" r="2" fill="#fff" opacity="0.8"/>
+                  <path d="M18 64 L35 58 L52 64 L35 72 Z" fill="#2a2420"/>
+                </svg>
+              </div>
+              <div class="train" id="train2" aria-hidden="true">
+                <svg viewBox="0 0 70 80">
+                  <ellipse cx="35" cy="72" rx="16" ry="5" fill="rgba(0,0,0,0.3)"/>
+                  <ellipse cx="35" cy="36" rx="34" ry="28" fill="#ffd27a" opacity="0.35"/>
+                  <rect x="22" y="8" width="10" height="12" rx="2" fill="#2a2420"/>
+                  <rect x="20" y="16" width="30" height="18" rx="3" fill="#3a342c"/>
+                  <rect x="26" y="20" width="18" height="8" rx="1" fill="#f0c46a" opacity="0.8"/>
+                  <ellipse cx="35" cy="48" rx="22" ry="18" fill="#4a443c"/>
+                  <ellipse cx="35" cy="48" rx="22" ry="18" fill="none" stroke="#2a261e" stroke-width="2"/>
+                  <circle cx="35" cy="48" r="9" fill="#fff3c8"/>
+                  <circle cx="35" cy="48" r="6" fill="#ffb02e"/>
+                  <circle cx="33" cy="46" r="2" fill="#fff" opacity="0.8"/>
+                  <path d="M18 64 L35 58 L52 64 L35 72 Z" fill="#2a2420"/>
+                </svg>
+              </div>
+              <div class="mole" id="mole" aria-hidden="true">
+                <svg viewBox="0 0 86 86">
+                  <ellipse cx="43" cy="72" rx="22" ry="6" fill="rgba(0,0,0,0.28)"/>
+                  <g class="stars">
+                    <text x="10" y="16" font-size="12" fill="#ffcf6a">✦</text>
+                    <text x="64" y="14" font-size="11" fill="#ffe9a0">✧</text>
+                    <text x="36" y="6" font-size="12" fill="#ffcf6a">✦</text>
+                  </g>
+                  <g class="body">
+                    <ellipse cx="43" cy="50" rx="26" ry="24" fill="#6b4a36"/>
+                    <ellipse cx="43" cy="53" rx="16" ry="14" fill="#c9a07a"/>
+                    <ellipse cx="28" cy="62" rx="8" ry="6" fill="#5a3c2c"/>
+                    <ellipse cx="58" cy="62" rx="8" ry="6" fill="#5a3c2c"/>
+                    <ellipse cx="28" cy="62" rx="3.5" ry="2.4" fill="#e8c4b0"/>
+                    <ellipse cx="58" cy="62" rx="3.5" ry="2.4" fill="#e8c4b0"/>
+                    <ellipse cx="43" cy="32" rx="20" ry="18" fill="#7a5640"/>
+                    <ellipse cx="32" cy="20" rx="6" ry="8" fill="#5a3c2c"/>
+                    <ellipse cx="54" cy="20" rx="6" ry="8" fill="#5a3c2c"/>
+                    <ellipse cx="32" cy="21" rx="3.2" ry="4.5" fill="#e8b8c8"/>
+                    <ellipse cx="54" cy="21" rx="3.2" ry="4.5" fill="#e8b8c8"/>
+                    <ellipse cx="43" cy="38" rx="8" ry="6.5" fill="#f3a8b8"/>
+                    <ellipse cx="43" cy="37" rx="3.2" ry="2.6" fill="#c45a72"/>
+                    <g class="eyes-ok">
+                      <ellipse cx="33" cy="30" rx="5" ry="5.5" fill="#fff"/>
+                      <ellipse cx="53" cy="30" rx="5" ry="5.5" fill="#fff"/>
+                      <circle cx="34" cy="31" r="2.4" fill="#1a1410"/>
+                      <circle cx="54" cy="31" r="2.4" fill="#1a1410"/>
+                      <circle cx="33" cy="29.5" r="0.9" fill="#fff"/>
+                      <circle cx="53" cy="29.5" r="0.9" fill="#fff"/>
+                    </g>
+                    <g class="eyes-hit">
+                      <path d="M29 27 l8 8 M37 27 l-8 8" stroke="#1a1410" stroke-width="2" stroke-linecap="round"/>
+                      <path d="M49 27 l8 8 M57 27 l-8 8" stroke="#1a1410" stroke-width="2" stroke-linecap="round"/>
+                    </g>
+                    <path d="M36 43 Q43 47 50 43" fill="none" stroke="#8a4a58" stroke-width="1.6" stroke-linecap="round"/>
+                    <path d="M18 46 Q10 40 14 50 Q18 52 22 48" fill="#6b4a36" stroke="#5a3c2c" stroke-width="1"/>
+                    <path d="M68 46 Q76 40 72 50 Q68 52 64 48" fill="#6b4a36" stroke="#5a3c2c" stroke-width="1"/>
+                  </g>
+                </svg>
+              </div>
+            </div>
+            <div class="hits" id="hits">
+                            <button class="hit" type="button" data-track="0" style="--poly:30% 32%, 43% 32%, 43% 52%, 24% 100%, 3% 100%, 30% 52%" aria-label="Track 1"></button>
+              <div class="badge" id="badge0" style="left:35.5%; top:34.8%; transform:translate(-50%,-50%)">1</div>
+              <button class="hit" type="button" data-track="1" style="--poly:43.5% 32%, 56.5% 32%, 56.5% 52%, 60.5% 100%, 39.5% 100%, 43.5% 52%" aria-label="Track 2"></button>
+              <div class="badge" id="badge1" style="left:50.0%; top:34.8%; transform:translate(-50%,-50%)">2</div>
+              <button class="hit" type="button" data-track="2" style="--poly:57% 32%, 70% 32%, 70% 52%, 97% 100%, 76% 100%, 57% 52%" aria-label="Track 3"></button>
+              <div class="badge" id="badge2" style="left:64.5%; top:34.8%; transform:translate(-50%,-50%)">3</div>
+            </div>
             <div class="flash"></div>
             <div class="bonk" id="bonk">Bonk!</div>
+            <div class="pick-hint" id="pickHint">Tap a track</div>
             <div class="result-pop" id="resultPop"></div>
           </div>
         </section>
@@ -1096,14 +993,7 @@
           <button class="chip" type="button" data-bet="250">$250</button>
           <button class="chip" type="button" data-bet="max">Max</button>
         </div>
-        <div class="track-picker" id="trackPicker">
-          <span class="bet-label">Tracks</span>
-          <button class="chip" type="button" data-tracks="3">3</button>
-          <button class="chip" type="button" data-tracks="4">4</button>
-          <button class="chip" type="button" data-tracks="5">5</button>
-          <button class="chip" type="button" data-tracks="6">6</button>
-        </div>
-        <p class="odds-hint" id="oddsHint">4 tracks &middot; 3 of 4 are safe &middot; 1.29x a clear</p>
+        <p class="odds-hint" id="oddsHint">3 tracks &middot; 2 of 3 are safe &middot; 1.46x a clear</p>
         <button class="start-btn" id="startBtn" type="submit">Step onto the tracks</button>
       </form>
 
@@ -1111,11 +1001,10 @@
         <details>
           <summary>How to play</summary>
           <p>
-            This is fake money &mdash; you start with $1,000. Step onto the tracks and pick a tunnel.
-            A train bursts out of one random tunnel. If it isn&rsquo;t yours, you survive and the multiplier goes up.
-            Pick again to keep climbing, or cash out and take your bet times the current multiplier.
-            Get hit and the bet is gone &mdash; cartoony, not gory. More tracks means a safer clear but a smaller step up.
-            The payout is tuned with a small house edge, about 3% per clear.
+            This is fake money &mdash; you start with $1,000. Step onto the tracks and tap one of the three tunnels.
+            A train bursts out of one random tunnel and races toward you. If it isn&rsquo;t yours, you survive and the multiplier goes up
+            (1.46x each clear). Tap another track to keep going, or cash out and take your bet times the current multiplier.
+            Get hit and the bet is gone &mdash; the mole just gets a cartoony bonk. There is a small house edge, about 3% per clear.
           </p>
         </details>
       </div>
@@ -1138,14 +1027,18 @@
     var STARTING_CENTS = 100000;
     var MIN_BET_CENTS = 100;
     var HOUSE = 0.97;
-    var MIN_TRACKS = 3;
-    var MAX_TRACKS = 6;
-    var DEFAULT_TRACKS = 4;
-    var STORAGE_KEY = "train-game-v1";
+    var TRACKS = 3;
+    var STEP_MULT = HOUSE * TRACKS / (TRACKS - 1);
+    var STORAGE_KEY = "train-game-v2";
     var HISTORY_MAX = 8;
+    var FAR_X = [35.5, 50, 64.5];
+    var NEAR_X = [15, 50, 85];
+    var FAR_Y = 52;
+    var NEAR_Y = 96;
+    var MOLE_DEPTH = 0.58;
 
     var DELAYS = {
-      walk: 350,
+      walk: 380,
       rumble: 900,
       burst: 700,
       hit: 1000,
@@ -1153,12 +1046,15 @@
       result: 600
     };
 
-    function stepMult(tracks) {
-      return HOUSE * tracks / (tracks - 1);
-    }
-    function multAfter(rounds, tracks) {
+    function multAfter(rounds) {
       if (rounds <= 0) return 1;
-      return Math.pow(stepMult(tracks), rounds);
+      return Math.pow(STEP_MULT, rounds);
+    }
+    function trackX(i, depth) {
+      return FAR_X[i] + (NEAR_X[i] - FAR_X[i]) * depth;
+    }
+    function trackY(depth) {
+      return FAR_Y + (NEAR_Y - FAR_Y) * depth;
     }
 
     var state = {
@@ -1166,7 +1062,7 @@
       history: [],
       muted: false,
       autoClear: null,
-      tracks: DEFAULT_TRACKS,
+      tracks: TRACKS,
       phase: "idle",
       round: 0,
       betCents: 0,
@@ -1184,9 +1080,13 @@
 
     var app = document.getElementById("app");
     var yardView = document.getElementById("yardView");
-    var tunnelsEl = document.getElementById("tunnels");
-    var lanesEl = document.getElementById("lanes");
-    var hero = document.getElementById("hero");
+    var hitsEl = document.getElementById("hits");
+    var mole = document.getElementById("mole");
+    var trains = [
+      document.getElementById("train0"),
+      document.getElementById("train1"),
+      document.getElementById("train2")
+    ];
     var balanceRead = document.getElementById("balanceRead");
     var roundRead = document.getElementById("roundRead");
     var statusLine = document.getElementById("statusLine");
@@ -1247,9 +1147,6 @@
         if (typeof data.autoClear === "number" && data.autoClear >= 1 && data.autoClear <= 30) {
           state.autoClear = data.autoClear;
         }
-        if (typeof data.tracks === "number" && data.tracks >= MIN_TRACKS && data.tracks <= MAX_TRACKS) {
-          state.tracks = Math.round(data.tracks);
-        }
       } catch (e) {}
     }
 
@@ -1261,8 +1158,7 @@
             balanceCents: state.balanceCents,
             history: state.history,
             muted: state.muted,
-            autoClear: state.autoClear,
-            tracks: state.tracks
+            autoClear: state.autoClear
           })
         );
       } catch (e) {}
@@ -1273,76 +1169,74 @@
       app.className = "app is-" + phase;
     }
 
-    function buildYard() {
-      var n = state.tracks;
-      yardView.style.setProperty("--tracks", String(n));
-      var tunnels = "";
-      var lanes = "";
-      for (var i = 0; i < n; i++) {
-        var label = String(i + 1);
-        tunnels +=
-          '<div class="tunnel" data-track="' + i + '">' +
-            '<div class="signal" aria-hidden="true"></div>' +
-            '<div class="arch"><div class="mouth"></div><span class="tunnel-num">' + label + "</span></div>" +
-          "</div>";
-        lanes +=
-          '<button class="lane" type="button" data-track="' + i + '" aria-label="Track ' + label + '">' +
-            '<span class="lane-hint">' + label + "</span>" +
-            '<span class="rail" aria-hidden="true"></span>' +
-            '<span class="train" aria-hidden="true">' +
-              '<span class="glow"></span>' +
-              '<span class="body">' +
-                '<span class="chimney"></span>' +
-                '<span class="cabin"></span>' +
-                '<span class="boiler"><span class="lamp"></span></span>' +
-                '<span class="cow"></span>' +
-              "</span>" +
-            "</span>" +
-          "</button>";
+    function placeMole(track, instant) {
+      var x, y;
+      if (track == null || track < 0) {
+        x = 50;
+        y = trackY(MOLE_DEPTH);
+      } else {
+        x = trackX(track, MOLE_DEPTH);
+        y = trackY(MOLE_DEPTH);
       }
-      tunnelsEl.innerHTML = tunnels;
-      lanesEl.innerHTML = lanes;
+      if (instant) mole.style.transitionDuration = "0s";
+      mole.style.left = x + "%";
+      mole.style.top = y + "%";
+      if (instant) {
+        mole.offsetHeight;
+        mole.style.transitionDuration = "";
+      }
     }
 
-    function placeHero(track, instant) {
-      var n = state.tracks;
-      var pct;
-      if (track == null || track < 0) {
-        pct = 50;
-      } else {
-        var col = 88 / n;
-        var start = 6;
-        pct = start + col * (track + 0.5);
+    function hideTrains() {
+      for (var i = 0; i < trains.length; i++) {
+        trains[i].className = "train";
+        trains[i].style.opacity = "0";
+        trains[i].style.left = trackX(i, 0.02) + "%";
+        trains[i].style.top = trackY(0.02) + "%";
+        trains[i].style.transform = "scale(0.28)";
+        if (trains[i].getAnimations) {
+          trains[i].getAnimations().forEach(function (a) { a.cancel(); });
+        }
       }
-      if (instant) hero.style.transitionDuration = "0s";
-      hero.style.left = pct + "%";
-      if (instant) {
-        hero.offsetHeight;
-        hero.style.transitionDuration = "";
+    }
+
+    function runTrain(track, kind, duration) {
+      var el = trains[track];
+      var startD = 0.02;
+      var endD = kind === "hit" ? MOLE_DEPTH + 0.02 : 1.05;
+      var startS = 0.28;
+      var endS = kind === "hit" ? 1.15 : 1.45;
+      el.className = "train is-" + (kind === "hit" ? "impact" : kind === "pass" ? "passing" : "bursting");
+      el.style.zIndex = kind === "hit" ? "9" : "6";
+      if (el.animate) {
+        el.animate(
+          [
+            { left: trackX(track, startD) + "%", top: trackY(startD) + "%", transform: "scale(" + startS + ")", opacity: 1 },
+            { left: trackX(track, endD) + "%", top: trackY(endD) + "%", transform: "scale(" + endS + ")", opacity: kind === "pass" ? 0 : 1 }
+          ],
+          { duration: duration, easing: "cubic-bezier(0.18, 0.7, 0.22, 1)", fill: "forwards" }
+        );
+      } else {
+        el.style.left = trackX(track, endD) + "%";
+        el.style.top = trackY(endD) + "%";
+        el.style.transform = "scale(" + endS + ")";
+        el.style.opacity = kind === "pass" ? "0" : "1";
       }
     }
 
     function clearMarks() {
-      var tunnels = tunnelsEl.querySelectorAll(".tunnel");
-      var lanes = lanesEl.querySelectorAll(".lane");
-      var i;
-      for (i = 0; i < tunnels.length; i++) {
-        tunnels[i].className = "tunnel";
-        var sig = tunnels[i].querySelector(".signal");
-        if (sig) sig.className = "signal";
-      }
-      for (i = 0; i < lanes.length; i++) {
-        lanes[i].className = "lane";
-      }
+      var hits = hitsEl.querySelectorAll(".hit");
+      var badges = hitsEl.querySelectorAll(".badge");
+      for (var i = 0; i < hits.length; i++) hits[i].className = "hit";
+      for (var b = 0; b < badges.length; b++) badges[b].classList.remove("is-chosen");
+      hideTrains();
     }
 
     function markChosen(track) {
-      var tun = tunnelsEl.querySelector('.tunnel[data-track="' + track + '"]');
-      var lane = lanesEl.querySelector('.lane[data-track="' + track + '"]');
-      if (tun) tun.classList.add("is-chosen");
-      if (lane) lane.classList.add("is-chosen");
-      var sig = tun && tun.querySelector(".signal");
-      if (sig) sig.classList.add("is-amber");
+      var hit = hitsEl.querySelector('.hit[data-track="' + track + '"]');
+      var badge = document.getElementById("badge" + track);
+      if (hit) hit.classList.add("is-chosen");
+      if (badge) badge.classList.add("is-chosen");
     }
 
     function currentBetCents() {
@@ -1377,6 +1271,14 @@
       return (state.phase === "pick" || state.phase === "safe") && state.round > 0 && state.betCents > 0;
     }
 
+    function keepYardInView() {
+      try {
+        yardView.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
+      } catch (e) {
+        try { yardView.scrollIntoView(true); } catch (e2) {}
+      }
+    }
+
     function renderStatic() {
       balanceRead.textContent = fmtMoney(state.balanceCents);
       iconSound.hidden = state.muted;
@@ -1396,17 +1298,7 @@
         chips[i].disabled = state.phase !== "idle" || state.balanceCents < need;
       }
 
-      var tBtns = document.querySelectorAll("#trackPicker [data-tracks]");
-      for (var t = 0; t < tBtns.length; t++) {
-        var tn = Number(tBtns[t].getAttribute("data-tracks"));
-        tBtns[t].classList.toggle("is-on", tn === state.tracks);
-        tBtns[t].disabled = state.phase !== "idle";
-      }
-
-      var sm = stepMult(state.tracks);
-      oddsHint.textContent =
-        state.tracks + " tracks \u00b7 " + (state.tracks - 1) + " of " + state.tracks +
-        " are safe \u00b7 " + fmtMult(sm) + " a clear";
+      oddsHint.textContent = "3 tracks \u00b7 2 of 3 are safe \u00b7 " + fmtMult(STEP_MULT) + " a clear";
 
       var canStart =
         state.phase === "idle" &&
@@ -1425,11 +1317,6 @@
       }
       brokeOverlay.classList.toggle("show", state.phase === "idle" && state.balanceCents < MIN_BET_CENTS);
 
-      var lanes = lanesEl.querySelectorAll(".lane");
-      for (var L = 0; L < lanes.length; L++) {
-        lanes[L].disabled = state.phase !== "pick";
-      }
-
       if (!state.history.length) {
         historyList.innerHTML = '<li class="empty" style="display:block">No runs yet. The tunnels are quiet.</li>';
       } else {
@@ -1442,7 +1329,6 @@
             return (
               "<li>" +
               "<span>R" + (h.round || 0) + "</span>" +
-              "<span>" + (h.tracks || state.tracks) + "T</span>" +
               '<span class="' + resCls + '">' + res + "</span>" +
               "<span>" + (hit ? "\u2014" : fmtMult(h.multiplier)) + "</span>" +
               '<span class="' + resCls + '">' + pay + "</span>" +
@@ -1456,13 +1342,13 @@
     function renderRide() {
       roundRead.textContent = String(state.round);
       var payoutEl = payoutRead.closest(".metric");
-      var next = multAfter(state.round + 1, state.tracks);
+      var next = multAfter(state.round + 1);
       if (state.phase === "idle" && !state.betCents) {
         multRead.textContent = "\u2014";
-        nextRead.textContent = fmtMult(stepMult(state.tracks));
+        nextRead.textContent = fmtMult(STEP_MULT);
         var previewBet = currentBetCents();
         if (previewBet >= MIN_BET_CENTS) {
-          payoutRead.textContent = fmtMoney(Math.round(previewBet * stepMult(state.tracks)));
+          payoutRead.textContent = fmtMoney(Math.round(previewBet * STEP_MULT));
           if (payoutEl) payoutEl.classList.add("has-value");
         } else {
           payoutRead.textContent = "\u2014";
@@ -1594,14 +1480,13 @@
     };
 
     function rollTrainTrack() {
-      var n = state.tracks;
+      var n = TRACKS;
       var chosen = state.chosen;
       if (forceTrainTrack != null && forceTrainTrack >= 0 && forceTrainTrack < n) {
         return forceTrainTrack;
       }
       if (forceHit) return chosen;
       if (forceSurvive) {
-        if (n <= 1) return (chosen + 1) % n;
         var safe = Math.floor(rng() * (n - 1));
         return safe >= chosen ? safe + 1 : safe;
       }
@@ -1625,19 +1510,20 @@
       save();
       flashBalance("down");
       clearMarks();
-      placeHero(null, false);
-      renderStatic();
-      renderRide();
+      placeMole(null, false);
       setPhase("pick");
       setStatus("Pick a track");
+      renderStatic();
+      renderRide();
       sfx.start();
+      keepYardInView();
       return true;
     }
 
     function pickTrack(index) {
       index = Number(index);
       if (state.phase !== "pick") return false;
-      if (!isFinite(index) || index < 0 || index >= state.tracks) return false;
+      if (!isFinite(index) || index < 0 || index >= TRACKS) return false;
       hideResult();
       clearTimers();
       state.chosen = index;
@@ -1647,7 +1533,7 @@
       setPhase("commit");
       setStatus("Committing to track " + (index + 1) + "\u2026");
       sfx.step();
-      placeHero(index, false);
+      placeMole(index, false);
       renderStatic();
       renderRide();
       later(DELAYS.walk, beginRumble);
@@ -1661,6 +1547,7 @@
       sfx.rumble();
       later(120, sfx.whistle);
       renderStatic();
+      renderRide();
       later(DELAYS.rumble, burstTrain);
     }
 
@@ -1670,19 +1557,13 @@
       state.trainTrack = train;
       setPhase("burst");
       setStatus("A train bursts out of tunnel " + (train + 1) + "!");
-      var tun = tunnelsEl.querySelector('.tunnel[data-track="' + train + '"]');
-      var lane = lanesEl.querySelector('.lane[data-track="' + train + '"]');
       var hit = train === state.chosen;
-      if (tun) {
-        var sig = tun.querySelector(".signal");
-        if (sig) sig.className = "signal is-red";
-      }
-      if (lane) {
-        lane.classList.add(hit ? "is-bursting" : "is-passing");
-        lane.classList.add(hit ? "is-danger" : "is-safe");
-      }
+      var hitEl = hitsEl.querySelector('.hit[data-track="' + train + '"]');
+      if (hitEl) hitEl.classList.add(hit ? "is-danger" : "is-safe");
+      runTrain(train, hit ? "hit" : "pass", DELAYS.burst);
       sfx.approach();
       renderStatic();
+      renderRide();
       later(DELAYS.burst, function () {
         if (hit) beginHit();
         else beginSurvive();
@@ -1692,19 +1573,10 @@
     function beginSurvive() {
       if (state.phase !== "burst") return;
       state.round += 1;
-      state.multiplier = multAfter(state.round, state.tracks);
+      state.multiplier = multAfter(state.round);
       setPhase("safe");
       sfx.pass();
       later(60, sfx.clear);
-      var tuns = tunnelsEl.querySelectorAll(".tunnel");
-      for (var i = 0; i < tuns.length; i++) {
-        var tr = Number(tuns[i].getAttribute("data-track"));
-        var sig = tuns[i].querySelector(".signal");
-        if (!sig) continue;
-        if (tr === state.trainTrack) sig.className = "signal is-red";
-        else if (tr === state.chosen) sig.className = "signal is-green";
-        else sig.className = "signal";
-      }
       setStatus("Clear! Multiplier " + fmtMult(state.multiplier));
       showResult("Clear  \u00b7  " + fmtMult(state.multiplier), true);
       renderStatic();
@@ -1726,11 +1598,6 @@
 
     function beginHit() {
       if (state.phase !== "burst") return;
-      var lane = lanesEl.querySelector('.lane[data-track="' + state.trainTrack + '"]');
-      if (lane) {
-        lane.classList.remove("is-bursting");
-        lane.classList.add("is-impact");
-      }
       setPhase("hit");
       sfx.hit();
       later(80, sfx.bonk);
@@ -1768,7 +1635,7 @@
         bet: state.betCents,
         payout: result === "hit" ? 0 : state.payoutCents,
         multiplier: state.multiplier,
-        tracks: state.tracks,
+        tracks: TRACKS,
         ts: Date.now()
       });
       state.history = state.history.slice(0, HISTORY_MAX);
@@ -1786,7 +1653,7 @@
       state.payoutCents = 0;
       hideResult();
       clearMarks();
-      placeHero(null, false);
+      placeMole(null, false);
       if (state.balanceCents < MIN_BET_CENTS) setStatus("Stranded at the platform");
       else setStatus("Waiting at the platform");
       renderStatic();
@@ -1814,24 +1681,11 @@
       save();
       setPhase("idle");
       clearMarks();
-      placeHero(null, true);
+      placeMole(null, true);
       setStatus("Bankroll reset \u2014 waiting at the platform");
       if (Number(betInput.value) * 100 > state.balanceCents || !betInput.value) betInput.value = "50";
       renderStatic();
       renderRide();
-    }
-
-    function setTracks(n) {
-      n = Math.round(Number(n));
-      if (n < MIN_TRACKS || n > MAX_TRACKS) return false;
-      if (state.phase !== "idle") return false;
-      state.tracks = n;
-      save();
-      buildYard();
-      placeHero(null, true);
-      renderStatic();
-      renderRide();
-      return true;
     }
 
     betForm.addEventListener("submit", function (e) {
@@ -1851,17 +1705,17 @@
       renderRide();
     });
 
-    document.getElementById("trackPicker").addEventListener("click", function (e) {
-      var btn = e.target.closest("[data-tracks]");
-      if (!btn || btn.disabled) return;
-      sfx.click();
-      setTracks(btn.getAttribute("data-tracks"));
-    });
-
-    lanesEl.addEventListener("click", function (e) {
-      var btn = e.target.closest(".lane");
-      if (!btn || btn.disabled) return;
+    function onTrackPointer(e) {
+      var btn = e.target.closest("[data-track]");
+      if (!btn) return;
+      if (state.phase !== "pick") return;
+      e.preventDefault();
       pickTrack(btn.getAttribute("data-track"));
+    }
+    hitsEl.addEventListener("click", onTrackPointer);
+    hitsEl.addEventListener("pointerup", function (e) {
+      if (e.pointerType === "mouse") return;
+      onTrackPointer(e);
     });
 
     betInput.addEventListener("input", function () { renderStatic(); renderRide(); });
@@ -1905,7 +1759,7 @@
         }
       }
       var num = e.key && e.key.length === 1 ? Number(e.key) : NaN;
-      if (num >= 1 && num <= state.tracks && state.phase === "pick") {
+      if (num >= 1 && num <= TRACKS && state.phase === "pick") {
         e.preventDefault();
         pickTrack(num - 1);
       }
@@ -1920,7 +1774,7 @@
     );
 
     load();
-    buildYard();
+    hideTrains();
     if (state.balanceCents < MIN_BET_CENTS) {
       /* keep broke state visible */
     } else if (!betInput.value) {
@@ -1929,7 +1783,7 @@
     if (Number(betInput.value) * 100 > state.balanceCents && state.balanceCents >= MIN_BET_CENTS) {
       betInput.value = String(Math.floor(state.balanceCents / 100));
     }
-    placeHero(null, true);
+    placeMole(null, true);
     setPhase("idle");
     setStatus(state.balanceCents < MIN_BET_CENTS ? "Stranded at the platform" : "Waiting at the platform");
     renderStatic();
@@ -1941,16 +1795,17 @@
           balanceCents: state.balanceCents,
           round: state.round,
           multiplier: state.multiplier,
-          nextMultiplier: multAfter(state.round + 1, state.tracks),
+          nextMultiplier: multAfter(state.round + 1),
           phase: state.phase,
           betCents: state.betCents,
-          tracks: state.tracks,
+          tracks: TRACKS,
           chosen: state.chosen,
           trainTrack: state.trainTrack,
           history: state.history.slice(),
           muted: state.muted,
           autoClear: state.autoClear,
-          stepMult: stepMult(state.tracks)
+          stepMult: STEP_MULT,
+          version: "tunnels-v2-mole"
         };
       },
       setBalance: function (dollars) {
@@ -1971,7 +1826,6 @@
       setForceHit: function (v) { forceHit = !!v; if (v) { forceSurvive = false; forceTrainTrack = null; } },
       setForceTrainTrack: function (n) { forceTrainTrack = n == null ? null : Number(n); forceSurvive = false; forceHit = false; },
       setRng: function (fn) { rng = fn || Math.random; },
-      setTracks: function (n) { return setTracks(n); },
       startRun: function (dollars) {
         betInput.value = String(dollars);
         return startRun(Math.round(Number(dollars) * 100));
@@ -1988,10 +1842,6 @@
         opts = opts || {};
         clearTimers();
         hideResult();
-        if (opts.tracks) {
-          state.tracks = Math.max(MIN_TRACKS, Math.min(MAX_TRACKS, Math.round(opts.tracks)));
-          buildYard();
-        }
         if (state.phase === "idle" || !state.betCents) {
           var bet = Math.round(Number(opts.bet != null ? opts.bet : 50) * 100);
           if (bet > state.balanceCents) bet = maxBetCents();
@@ -2004,28 +1854,24 @@
           }
         }
         state.round = opts.rounds != null ? Math.max(0, Math.round(opts.rounds)) : 3;
-        state.multiplier = multAfter(state.round, state.tracks);
+        state.multiplier = multAfter(state.round);
         state.chosen = opts.track != null ? Number(opts.track) : 1;
         state.trainTrack = null;
         clearMarks();
         markChosen(state.chosen);
-        placeHero(state.chosen, true);
-        renderStatic();
-        renderRide();
+        placeMole(state.chosen, true);
         var mode = opts.mode || "rumble";
         if (mode === "pick" || mode === "safe") {
           setPhase(mode === "safe" ? "safe" : "pick");
           setStatus(state.round ? "Pick again, or cash out" : "Pick a track");
-          renderStatic();
-          renderRide();
         } else {
           setPhase("rumble");
           setStatus("The tunnels rumble\u2026");
-          renderStatic();
-          renderRide();
           DELAYS.rumble = opts.rumbleMs || 60000;
           later(DELAYS.rumble, burstTrain);
         }
+        renderStatic();
+        renderRide();
       }
     };
   })();
