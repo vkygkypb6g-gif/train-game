@@ -1,0 +1,2034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#090b0d" />
+  <meta name="description" content="Pick a railway track, dodge the train, and cash out with fake money." />
+  <title>Tunnels</title>
+  <style>
+    :root {
+      --bg: #090b0d;
+      --bg-2: #10141a;
+      --panel: #161a20;
+      --panel-2: #1c222a;
+      --line: rgba(180, 196, 212, 0.16);
+      --brass: #d4a25a;
+      --brass-hi: #f3dfb3;
+      --brass-dim: #8a6a3a;
+      --amber: #ffb02e;
+      --led: #ffcf6a;
+      --go: #3ecf7a;
+      --go-dim: #1e7a44;
+      --stop: #e24a3b;
+      --cream: #eef1f4;
+      --muted: #8b939c;
+      --steel: #8a949e;
+      --danger: #ff6b5a;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+      --font-ui: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+      --font-num: "SF Mono", "Cascadia Mono", "Consolas", "Liberation Mono", ui-monospace, monospace;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --tracks: 4;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: var(--bg); color: var(--cream); }
+    body {
+      font-family: var(--font-ui);
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button, input { font-family: inherit; }
+    button { cursor: pointer; border: 0; background: none; color: inherit; }
+    button:disabled { cursor: not-allowed; opacity: 0.45; }
+
+    .grain {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      opacity: 0.09;
+      mix-blend-mode: overlay;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.85'/%3E%3C/svg%3E");
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: calc(18px + var(--safe-top)) 18px calc(18px + var(--safe-bottom));
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    header.top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand { min-width: 0; }
+    .logo {
+      font-weight: 800;
+      letter-spacing: 0.46em;
+      font-size: clamp(1.15rem, 3vw, 1.55rem);
+      text-indent: 0.46em;
+      color: var(--brass-hi);
+      text-transform: uppercase;
+      text-shadow: 0 0 24px rgba(212, 162, 90, 0.25);
+    }
+    .tag {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .top-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .balance {
+      background: linear-gradient(180deg, #242a32, #14181e);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-family: var(--font-num);
+      font-size: 0.95rem;
+      color: var(--led);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+      min-width: 8.2rem;
+      text-align: center;
+    }
+    .balance.is-up { color: var(--go); }
+    .balance.is-down { color: var(--danger); }
+    .icon-btn, .text-btn {
+      height: 38px;
+      border: 1px solid var(--line);
+      background: #14181e;
+      border-radius: 10px;
+      color: var(--brass);
+      display: grid;
+      place-items: center;
+      padding: 0 10px;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .text-btn { font-size: 0.72rem; letter-spacing: 0.12em; font-weight: 700; text-transform: uppercase; }
+    .icon-btn { width: 38px; }
+    .icon-btn:hover, .text-btn:hover { background: #242a32; color: var(--brass-hi); border-color: var(--brass-dim); }
+    .icon-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    .stage {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(260px, 48%) 1fr;
+      gap: 18px;
+      min-height: 0;
+    }
+
+    .yard-panel {
+      position: relative;
+      background:
+        linear-gradient(180deg, rgba(212,162,90,0.06), transparent 18%),
+        var(--bg-2);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      overflow: hidden;
+      box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,0.02);
+      min-height: 460px;
+      display: flex;
+      flex-direction: column;
+    }
+    .plaque {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 8;
+      font-size: 0.64rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--brass-dim);
+      background: rgba(9,11,13,0.72);
+      border: 1px solid var(--line);
+      padding: 4px 10px;
+      border-radius: 999px;
+      backdrop-filter: blur(6px);
+      white-space: nowrap;
+    }
+
+    .yard-view {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 50% -8%, #1c2836 0%, transparent 48%),
+        linear-gradient(180deg, #0b1016 0 42%, #161410 42%, #12100c 100%);
+    }
+    .sky {
+      position: absolute;
+      left: 0; right: 0; top: 0;
+      height: 46%;
+      pointer-events: none;
+      background-image:
+        radial-gradient(1px 1px at 8% 22%, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1.2px 1.2px at 18% 40%, rgba(255,255,255,0.45), transparent),
+        radial-gradient(1px 1px at 28% 16%, rgba(255,255,255,0.6), transparent),
+        radial-gradient(1px 1px at 42% 30%, rgba(255,255,255,0.35), transparent),
+        radial-gradient(1.4px 1.4px at 58% 12%, rgba(255,255,255,0.7), transparent),
+        radial-gradient(1px 1px at 70% 28%, rgba(255,255,255,0.4), transparent),
+        radial-gradient(1px 1px at 82% 18%, rgba(255,255,255,0.55), transparent),
+        radial-gradient(1.2px 1.2px at 90% 36%, rgba(255,255,255,0.35), transparent);
+    }
+    .moon {
+      position: absolute;
+      top: 16px;
+      right: 22px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 32%, #f6efe2, #c9b894);
+      box-shadow: 0 0 28px rgba(243,234,220,0.28);
+      z-index: 1;
+      pointer-events: none;
+    }
+    .hill {
+      position: absolute;
+      left: -6%;
+      right: -6%;
+      top: 8%;
+      height: 40%;
+      background: linear-gradient(180deg, #2c343c 0 10%, #1a2026 10% 100%);
+      border-radius: 46% 46% 0 0 / 16% 16% 0 0;
+      box-shadow: inset 0 10px 0 rgba(255,255,255,0.03), 0 -8px 30px rgba(0,0,0,0.25);
+      z-index: 2;
+    }
+    .hill::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(90deg, transparent 0 17px, rgba(0,0,0,0.12) 17px 18px),
+        repeating-linear-gradient(0deg, transparent 0 11px, rgba(255,255,255,0.015) 11px 12px);
+      border-radius: inherit;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    .tunnels {
+      position: absolute;
+      left: 6%;
+      right: 6%;
+      top: 16%;
+      height: 34%;
+      display: grid;
+      grid-template-columns: repeat(var(--tracks), 1fr);
+      align-items: end;
+      z-index: 4;
+      pointer-events: none;
+    }
+    .tunnel {
+      position: relative;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .signal {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #2a261c;
+      box-shadow: 0 0 0 3px #161310, 0 0 6px rgba(240,164,58,0.08);
+      margin-bottom: 7px;
+      z-index: 2;
+    }
+    .signal.is-amber {
+      background: #f0a43a;
+      box-shadow: 0 0 0 3px #161310, 0 0 14px rgba(240,164,58,0.85);
+    }
+    .signal.is-red {
+      background: #ff4d3d;
+      box-shadow: 0 0 0 3px #161310, 0 0 16px rgba(255,77,61,0.9);
+    }
+    .signal.is-green {
+      background: #3ecf7a;
+      box-shadow: 0 0 0 3px #161310, 0 0 14px rgba(62,207,122,0.85);
+    }
+    .app.is-rumble .signal { animation: signalFlicker 0.16s steps(2) infinite; }
+    .arch {
+      width: min(84%, 102px);
+      aspect-ratio: 3 / 3.55;
+      position: relative;
+      background: linear-gradient(180deg, #5a5248, #3a342c 28%, #221e18);
+      border-radius: 50% 50% 4px 4px / 64% 64% 4px 4px;
+      box-shadow: 0 0 0 3px #3a342c, 0 0 0 6px #14110d, inset 0 -8px 16px rgba(0,0,0,0.5);
+      overflow: hidden;
+      margin-bottom: -6px;
+    }
+    .mouth {
+      position: absolute;
+      left: 11%;
+      right: 11%;
+      top: 13%;
+      bottom: -2px;
+      background: radial-gradient(ellipse at 50% 100%, #1c140c 0%, #070605 58%);
+      border-radius: 50% 50% 0 0 / 72% 72% 0 0;
+      box-shadow: inset 0 10px 16px rgba(0,0,0,0.55);
+    }
+    .tunnel.is-chosen .arch {
+      box-shadow: 0 0 0 3px #3a3020, 0 0 0 5px #d4a25a, 0 0 18px rgba(212,162,90,0.35), inset 0 -8px 16px rgba(0,0,0,0.5);
+    }
+    .tunnel-num {
+      position: absolute;
+      left: 50%;
+      bottom: 8px;
+      transform: translateX(-50%);
+      font-family: var(--font-num);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      color: #6a6258;
+      z-index: 2;
+    }
+    .ground {
+      position: absolute;
+      left: 0; right: 0;
+      top: 48%;
+      bottom: 0;
+      background:
+        repeating-linear-gradient(90deg, transparent 0 13px, rgba(0,0,0,0.14) 13px 14px),
+        linear-gradient(180deg, #2c281e 0, #1c1913 28%, #14110d 100%);
+      box-shadow: inset 0 16px 22px rgba(0,0,0,0.35);
+      z-index: 3;
+    }
+    .platform {
+      position: absolute;
+      left: 0; right: 0;
+      bottom: 0;
+      height: 22px;
+      background: linear-gradient(180deg, #3a3428, #221e18);
+      border-top: 1px solid rgba(212,162,90,0.18);
+      z-index: 4;
+    }
+    .lanes {
+      position: absolute;
+      left: 6%;
+      right: 6%;
+      top: 0;
+      bottom: 0;
+      display: grid;
+      grid-template-columns: repeat(var(--tracks), 1fr);
+      z-index: 5;
+    }
+    .lane {
+      position: relative;
+      height: 100%;
+      background: none;
+      border: 0;
+      color: inherit;
+      opacity: 1;
+      border-radius: 0;
+    }
+    .lane:disabled { opacity: 1; cursor: default; }
+    .app.is-pick .lane { cursor: pointer; }
+    .app.is-pick .lane:hover .rail,
+    .app.is-pick .lane:focus-visible .rail { filter: drop-shadow(0 0 8px rgba(240,164,58,0.4)); }
+    .rail {
+      position: absolute;
+      top: 0;
+      bottom: 22px;
+      left: 50%;
+      width: 32px;
+      margin-left: -16px;
+      background:
+        repeating-linear-gradient(180deg, #5a4630 0 6px, transparent 6px 15px),
+        linear-gradient(90deg, transparent 0 5px, #9aa3ac 5px 8px, transparent 8px 24px, #9aa3ac 24px 27px, transparent 27px);
+      opacity: 0.92;
+      pointer-events: none;
+    }
+    .lane.is-chosen .rail { filter: drop-shadow(0 0 10px rgba(240,164,58,0.55)); }
+    .lane.is-danger .rail { filter: drop-shadow(0 0 10px rgba(255,77,61,0.5)); }
+    .lane.is-safe .rail { filter: drop-shadow(0 0 8px rgba(62,207,122,0.4)); }
+    .lane-hint {
+      position: absolute;
+      left: 50%;
+      top: 10px;
+      transform: translateX(-50%);
+      font-family: var(--font-num);
+      font-size: 0.68rem;
+      color: var(--muted);
+      background: rgba(9,11,13,0.55);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 1px 7px;
+      pointer-events: none;
+      opacity: 0;
+    }
+    .app.is-pick .lane-hint { opacity: 0.9; }
+
+    .train {
+      position: absolute;
+      left: 50%;
+      top: -28%;
+      width: 42px;
+      margin-left: -21px;
+      z-index: 6;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(0) scale(0.38);
+      filter: drop-shadow(0 8px 10px rgba(0,0,0,0.45));
+    }
+    .lane.is-bursting .train { animation: trainBurst 0.7s cubic-bezier(0.18, 0.7, 0.22, 1) forwards; }
+    .lane.is-passing .train { animation: trainPass 0.85s cubic-bezier(0.2, 0.7, 0.3, 1) forwards; }
+    .lane.is-impact .train { animation: trainHit 0.7s cubic-bezier(0.2, 0.5, 0.2, 1) forwards; }
+    .train .glow {
+      position: absolute;
+      left: 50%;
+      top: 38%;
+      width: 90px;
+      height: 90px;
+      margin-left: -45px;
+      margin-top: -30px;
+      background: radial-gradient(circle, rgba(255, 220, 140, 0.75), rgba(255,176,46,0.15) 42%, transparent 68%);
+      z-index: 0;
+    }
+    .train .body { position: relative; z-index: 1; width: 42px; }
+    .train .chimney {
+      width: 10px;
+      height: 12px;
+      margin: 0 auto 1px;
+      background: linear-gradient(180deg, #2a2420, #0e0c0a);
+      border-radius: 2px 2px 0 0;
+      box-shadow: 0 -6px 8px rgba(160,160,160,0.25);
+    }
+    .train .cabin {
+      width: 28px;
+      height: 16px;
+      margin: 0 auto;
+      background: linear-gradient(180deg, #3a342c, #1a1612);
+      border-radius: 3px 3px 0 0;
+      box-shadow: inset 0 0 0 1px #2a261e;
+      position: relative;
+    }
+    .train .cabin::after {
+      content: "";
+      position: absolute;
+      left: 6px; right: 6px; top: 4px;
+      height: 6px;
+      background: #f0c46a;
+      opacity: 0.7;
+      border-radius: 1px;
+    }
+    .train .boiler {
+      width: 38px;
+      height: 28px;
+      margin: 0 auto;
+      background: linear-gradient(180deg, #4a443c, #1c1914);
+      border-radius: 8px 8px 6px 6px;
+      box-shadow: inset 0 0 0 1px #2e2a24, inset 0 8px 8px rgba(255,255,255,0.05);
+      position: relative;
+    }
+    .train .lamp {
+      position: absolute;
+      left: 50%;
+      top: 8px;
+      width: 16px;
+      height: 16px;
+      margin-left: -8px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, #fff6d6, #ffb02e 55%, #c47d28);
+      box-shadow: 0 0 16px rgba(255, 200, 80, 0.95);
+    }
+    .train .cow {
+      width: 0;
+      height: 0;
+      margin: -2px auto 0;
+      border-left: 16px solid transparent;
+      border-right: 16px solid transparent;
+      border-top: 10px solid #2a2420;
+    }
+    .hero {
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      width: 46px;
+      height: 90px;
+      margin-left: -23px;
+      z-index: 7;
+      transition: left 0.35s cubic-bezier(0.22, 0.8, 0.28, 1);
+      pointer-events: none;
+    }
+    .hero-shadow {
+      position: absolute;
+      left: 50%;
+      bottom: 4px;
+      width: 28px;
+      height: 8px;
+      margin-left: -14px;
+      background: rgba(0,0,0,0.4);
+      border-radius: 50%;
+      filter: blur(1px);
+    }
+    .hero-fig { position: absolute; inset: 0; transform-origin: 50% 90%; }
+    .hero .cap {
+      position: absolute;
+      left: 50%;
+      top: 2px;
+      width: 22px;
+      height: 8px;
+      margin-left: -11px;
+      background: #2a3a4a;
+      border-radius: 6px 6px 1px 1px;
+      z-index: 2;
+    }
+    .hero .cap::after {
+      content: "";
+      position: absolute;
+      left: -4px;
+      bottom: 0;
+      width: 10px;
+      height: 3px;
+      background: #1a2430;
+      border-radius: 2px;
+    }
+    .hero .head {
+      position: absolute;
+      left: 50%;
+      top: 8px;
+      width: 22px;
+      height: 22px;
+      margin-left: -11px;
+      background: #e8c8a0;
+      border-radius: 50%;
+      z-index: 1;
+      box-shadow: inset 0 -2px 0 rgba(0,0,0,0.08);
+    }
+    .hero .eye {
+      position: absolute;
+      top: 9px;
+      width: 4px;
+      height: 4px;
+      background: #1a1612;
+      border-radius: 50%;
+    }
+    .hero .eye.l { left: 5px; }
+    .hero .eye.r { right: 5px; }
+    .hero .mouth {
+      position: absolute;
+      left: 50%;
+      bottom: 5px;
+      width: 6px;
+      height: 3px;
+      margin-left: -3px;
+      border-bottom: 2px solid #8a5a40;
+      border-radius: 0 0 6px 6px;
+    }
+    .hero .torso {
+      position: absolute;
+      left: 50%;
+      top: 30px;
+      width: 20px;
+      height: 24px;
+      margin-left: -10px;
+      background: linear-gradient(180deg, #3d6a8a, #2a4a62);
+      border-radius: 6px 6px 4px 4px;
+    }
+    .hero .arm {
+      position: absolute;
+      top: 32px;
+      width: 6px;
+      height: 20px;
+      background: #2a4a62;
+      border-radius: 3px;
+    }
+    .hero .arm.l { left: 8px; transform: rotate(8deg); }
+    .hero .arm.r { right: 8px; transform: rotate(-8deg); }
+    .hero .leg {
+      position: absolute;
+      top: 52px;
+      width: 7px;
+      height: 24px;
+      background: #2a261e;
+      border-radius: 0 0 3px 3px;
+    }
+    .hero .leg.l { left: 14px; }
+    .hero .leg.r { right: 14px; }
+    .hero .boot {
+      position: absolute;
+      bottom: -3px;
+      left: -2px;
+      width: 11px;
+      height: 5px;
+      background: #1a1612;
+      border-radius: 2px;
+    }
+    .hero .stars {
+      position: absolute;
+      left: 50%;
+      top: -6px;
+      width: 40px;
+      height: 40px;
+      margin-left: -20px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .hero .stars span {
+      position: absolute;
+      color: var(--led);
+      font-size: 12px;
+      text-shadow: 0 0 8px rgba(255,207,106,0.8);
+    }
+    .hero .stars span:nth-child(1) { left: 2px; top: 8px; }
+    .hero .stars span:nth-child(2) { right: 0; top: 2px; }
+    .hero .stars span:nth-child(3) { left: 14px; top: -4px; }
+    .app.is-commit .hero-fig { animation: walkBob 0.35s ease; }
+    .app.is-safe .hero-fig { animation: hop 0.48s ease; }
+    .app.is-hit .hero-fig { animation: yeet 0.9s cubic-bezier(0.2, 0.7, 0.35, 1) forwards; }
+    .app.is-hit .hero .eye {
+      width: 6px;
+      height: 6px;
+      background: transparent;
+      border-radius: 0;
+    }
+    .app.is-hit .hero .eye.l,
+    .app.is-hit .hero .eye.r {
+      background:
+        linear-gradient(45deg, transparent 44%, #1a1612 44% 56%, transparent 56%),
+        linear-gradient(-45deg, transparent 44%, #1a1612 44% 56%, transparent 56%);
+    }
+    .app.is-hit .hero .mouth {
+      width: 8px;
+      height: 8px;
+      margin-left: -4px;
+      bottom: 3px;
+      border: 2px solid #8a5a40;
+      border-radius: 50%;
+      background: #3a2018;
+    }
+    .app.is-hit .hero .stars { opacity: 1; animation: orbit 0.7s linear infinite; }
+    .app.is-rumble .yard-panel { animation: shake 0.16s linear infinite; }
+    .app.is-hit .yard-panel { animation: impact 0.45s ease-out; }
+    .app.is-burst .yard-panel { animation: shake 0.12s linear infinite; }
+    .vignette {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      z-index: 7;
+      box-shadow: inset 0 0 80px rgba(0,0,0,0.45);
+    }
+    .flash {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      z-index: 8;
+      opacity: 0;
+    }
+    .app.is-hit .flash {
+      background: radial-gradient(circle at 50% 70%, rgba(255, 200, 80, 0.45), transparent 55%);
+      animation: flashGold 0.7s ease-out;
+    }
+    .app.is-safe .flash {
+      background: radial-gradient(circle at 50% 60%, rgba(62, 207, 122, 0.22), transparent 60%);
+      animation: flashGold 0.7s ease-out;
+    }
+    .bonk {
+      position: absolute;
+      left: 50%;
+      top: 42%;
+      transform: translate(-50%, -50%);
+      z-index: 9;
+      opacity: 0;
+      pointer-events: none;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-size: 1.4rem;
+      color: var(--led);
+      text-shadow: 0 6px 24px #000, 0 0 16px rgba(255,176,46,0.6);
+    }
+    .app.is-hit .bonk { animation: bannerIn 0.95s ease forwards; }
+    .result-pop {
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      z-index: 10;
+      min-width: 200px;
+      text-align: center;
+      padding: 10px 16px;
+      border-radius: 12px;
+      background: rgba(9, 11, 13, 0.88);
+      border: 1px solid var(--line);
+      display: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+    }
+    .result-pop.show { display: block; }
+    .result-pop.win { color: var(--go); border-color: rgba(62, 207, 122, 0.35); }
+    .result-pop.lose { color: var(--danger); border-color: rgba(226, 74, 59, 0.35); }
+
+    .dash { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+    .display {
+      background: radial-gradient(ellipse at 50% 0%, #2a2418, #10141a 55%);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 18px 18px 16px;
+      box-shadow: var(--shadow), inset 0 0 40px rgba(255, 176, 46, 0.04);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .display::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(180deg, transparent 0 3px, rgba(0,0,0,0.08) 3px 4px);
+      pointer-events: none;
+      opacity: 0.35;
+    }
+    .disp-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--brass-dim);
+    }
+    .round-read {
+      font-family: var(--font-num);
+      font-size: clamp(2.6rem, 8vw, 4.2rem);
+      line-height: 1;
+      color: var(--led);
+      text-shadow: 0 0 18px rgba(255, 176, 46, 0.35);
+      margin: 4px 0 2px;
+      font-weight: 700;
+    }
+    .status-line {
+      min-height: 1.2em;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .app.is-rumble .status-line,
+    .app.is-burst .status-line { color: var(--danger); animation: pulse 0.4s ease-in-out infinite; }
+    .app.is-cashed .status-line, .app.is-safe .status-line { color: var(--go); }
+    .app.is-hit .status-line { color: var(--danger); }
+    .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .metric {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px 14px;
+    }
+    .metric.payout { grid-column: 1 / -1; }
+    .metric span { display: block; font-size: 0.65rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+    .metric strong {
+      display: block;
+      margin-top: 4px;
+      font-family: var(--font-num);
+      font-size: 1.25rem;
+      color: var(--cream);
+      font-weight: 650;
+    }
+    .metric.payout.has-value strong { color: var(--go); }
+    .metric.next strong { color: var(--led); }
+    .cashout {
+      height: 64px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #efd7a0, #c9a36b 45%, #8a6a3a);
+      color: #1a1208;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-size: 1rem;
+      box-shadow: 0 8px 24px rgba(201, 163, 107, 0.25), inset 0 1px 0 rgba(255,255,255,0.4);
+      transition: transform 0.12s, filter 0.12s, box-shadow 0.12s;
+    }
+    .cashout:not(:disabled):hover { filter: brightness(1.06); transform: translateY(-1px); }
+    .cashout:not(:disabled):active { transform: translateY(1px); }
+    .app.is-pick .cashout:not(:disabled),
+    .app.is-safe .cashout:not(:disabled) { animation: cashPulse 1.2s ease-in-out infinite; }
+    .cashout:disabled { filter: grayscale(0.4); opacity: 0.4; box-shadow: none; }
+    .auto-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+    .auto-row label { letter-spacing: 0.04em; }
+    .auto-row input {
+      width: 72px;
+      height: 34px;
+      background: #10141a;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--cream);
+      text-align: center;
+      font-family: var(--font-num);
+      font-size: 0.95rem;
+    }
+    .auto-row input:focus { outline: 1px solid var(--brass); }
+    .history {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px 14px 8px;
+      flex: 1;
+      min-height: 120px;
+    }
+    .history h2 {
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .history ul { list-style: none; }
+    .history li {
+      display: grid;
+      grid-template-columns: 3.2rem 3.6rem 3.2rem 1fr 1fr;
+      gap: 6px;
+      font-family: var(--font-num);
+      font-size: 0.75rem;
+      padding: 6px 0;
+      border-top: 1px solid rgba(180,196,212,0.1);
+      color: var(--muted);
+    }
+    .history li .res-cash { color: var(--go); }
+    .history li .res-hit { color: var(--danger); }
+    .history .empty { color: var(--muted); font-size: 0.8rem; padding: 10px 0 8px; }
+    .bet-bar {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+    .bet-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .bet-input {
+      width: 110px;
+      height: 42px;
+      background: #10141a;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--led);
+      font-family: var(--font-num);
+      font-size: 1.05rem;
+      padding: 0 10px;
+      text-align: right;
+    }
+    .bet-input:focus { outline: 1px solid var(--brass); }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip {
+      height: 36px;
+      padding: 0 11px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #12161c;
+      color: var(--brass-hi);
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      font-weight: 650;
+    }
+    .chip:hover:not(:disabled) { border-color: var(--brass); background: #242018; }
+    .chip.is-on { background: #3a2c18; border-color: var(--brass); color: var(--led); }
+    .track-picker { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .track-picker .bet-label { margin-right: 2px; }
+    .odds-hint { width: 100%; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.04em; }
+    .start-btn {
+      margin-left: auto;
+      height: 46px;
+      padding: 0 22px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #4ae08a, #1ea85a);
+      color: #062114;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      box-shadow: 0 8px 20px rgba(62, 207, 122, 0.18);
+    }
+    .start-btn:not(:disabled):hover { filter: brightness(1.05); }
+    .start-btn:disabled {
+      opacity: 1;
+      background: #2a2a28;
+      color: #6a6860;
+      box-shadow: none;
+    }
+    .app:not(.is-idle) .bet-bar { opacity: 0.42; pointer-events: none; }
+    .help details { color: var(--muted); font-size: 0.82rem; line-height: 1.45; }
+    .help summary { cursor: pointer; color: var(--brass); letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.72rem; font-weight: 700; }
+    .help p { margin-top: 8px; max-width: 70ch; }
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      background: rgba(6, 5, 4, 0.72);
+      display: none;
+      place-items: center;
+      padding: 24px;
+    }
+    .overlay.show { display: grid; }
+    .modal {
+      width: min(420px, 100%);
+      background: linear-gradient(180deg, #242a32, #12161c);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .modal h2 { letter-spacing: 0.14em; text-transform: uppercase; color: var(--brass-hi); font-size: 1.05rem; }
+    .modal p { margin: 12px 0 20px; color: var(--muted); }
+    .modal .start-btn { width: 100%; margin-left: 0; }
+
+    @keyframes signalFlicker {
+      0%, 100% { filter: brightness(1.15); }
+      50% { filter: brightness(0.35); }
+    }
+    @keyframes trainBurst {
+      0% { opacity: 1; transform: translateY(0) scale(0.38); }
+      100% { opacity: 1; transform: translateY(58%) scale(1.05); }
+    }
+    @keyframes trainPass {
+      0% { opacity: 1; transform: translateY(0) scale(0.38); }
+      55% { opacity: 1; transform: translateY(70%) scale(1.15); }
+      100% { opacity: 0; transform: translateY(145%) scale(1.4); }
+    }
+    @keyframes trainHit {
+      0% { opacity: 1; transform: translateY(0) scale(0.38); }
+      70% { opacity: 1; transform: translateY(52%) scale(1.2); }
+      82% { transform: translateY(48%) scale(1.28) rotate(-4deg); }
+      100% { opacity: 1; transform: translateY(50%) scale(1.18) rotate(2deg); }
+    }
+    @keyframes walkBob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    @keyframes hop {
+      0%, 100% { transform: translateY(0) scale(1); }
+      40% { transform: translateY(-14px) scale(1.04); }
+      70% { transform: translateY(2px) scale(0.98); }
+    }
+    @keyframes yeet {
+      0% { transform: translateY(0) rotate(0); }
+      28% { transform: translateY(-92px) rotate(-28deg) scale(1.06); }
+      55% { transform: translateY(-64px) rotate(18deg); }
+      82% { transform: translateY(8px) rotate(-10deg); }
+      100% { transform: translateY(10px) rotate(-14deg); }
+    }
+    @keyframes orbit {
+      0% { transform: rotate(0); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes pulse { 50% { opacity: 0.45; } }
+    @keyframes cashPulse {
+      0%, 100% { box-shadow: 0 8px 24px rgba(201, 163, 107, 0.25), inset 0 1px 0 rgba(255,255,255,0.4); }
+      50% { box-shadow: 0 8px 32px rgba(255, 176, 46, 0.55), inset 0 1px 0 rgba(255,255,255,0.4); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-2px); }
+      75% { transform: translateX(2px); }
+    }
+    @keyframes impact {
+      0% { transform: translateY(0); }
+      25% { transform: translateY(10px); }
+      100% { transform: translateY(0); }
+    }
+    @keyframes flashGold {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    @keyframes bannerIn {
+      0% { opacity: 0; transform: translate(-50%, -40%) scale(0.7); }
+      18% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+      75% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -60%) scale(1); }
+    }
+
+    @media (max-width: 800px) {
+      .wrap { padding: calc(10px + var(--safe-top)) 12px calc(12px + var(--safe-bottom)); gap: 12px; }
+      header.top { flex-wrap: wrap; }
+      .brand { width: 100%; }
+      .logo { letter-spacing: 0.34em; text-indent: 0.34em; }
+      .tag { white-space: normal; }
+      .top-right { margin-left: auto; }
+      .stage { grid-template-columns: 1fr; }
+      .yard-panel { min-height: 0; height: 44vh; height: 44dvh; }
+      .bet-bar { padding: 12px; }
+      .start-btn { width: 100%; margin-left: 0; }
+      .chips, .track-picker { width: 100%; }
+      .history { min-height: 0; }
+      .history li { grid-template-columns: 2.4rem 3.2rem 2.8rem 1fr 1fr; font-size: 0.7rem; }
+      .cashout { height: 58px; position: sticky; bottom: 0; }
+      .arch { width: min(86%, 70px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="app is-idle" id="app">
+    <div class="wrap">
+      <header class="top">
+        <div class="brand">
+          <div class="logo">Tunnels</div>
+          <p class="tag">Pick a track. Don&rsquo;t get hit.</p>
+        </div>
+        <div class="top-right">
+          <div class="balance" id="balanceRead" aria-live="polite">$1,000.00</div>
+          <button class="icon-btn" id="muteBtn" type="button" aria-label="Mute sound" title="Mute">
+            <svg id="iconSound" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 10v4h3l5 4V6L7 10H4z"></path>
+              <path d="M16 9.5a3.5 3.5 0 0 1 0 5"></path>
+              <path d="M18.2 7a6.5 6.5 0 0 1 0 10"></path>
+            </svg>
+            <svg id="iconMute" viewBox="0 0 24 24" hidden aria-hidden="true">
+              <path d="M4 10v4h3l5 4V6L7 10H4z"></path>
+              <path d="M18 9l-5 6M13 9l5 6"></path>
+            </svg>
+          </button>
+          <button class="text-btn" id="resetBtn" type="button">Reset</button>
+        </div>
+      </header>
+
+      <div class="stage">
+        <section class="yard-panel" aria-label="Railway tunnels">
+          <div class="plaque">Stark Rail &middot; Zug</div>
+          <div class="yard-view" id="yardView">
+            <div class="sky" aria-hidden="true"></div>
+            <div class="moon" aria-hidden="true"></div>
+            <div class="hill" aria-hidden="true"></div>
+            <div class="tunnels" id="tunnels"></div>
+            <div class="ground">
+              <div class="lanes" id="lanes"></div>
+              <div class="hero" id="hero">
+                <div class="hero-shadow"></div>
+                <div class="hero-fig">
+                  <div class="stars" aria-hidden="true"><span>&#10022;</span><span>&#10023;</span><span>&#10022;</span></div>
+                  <div class="cap"></div>
+                  <div class="head">
+                    <span class="eye l"></span>
+                    <span class="eye r"></span>
+                    <span class="mouth"></span>
+                  </div>
+                  <div class="arm l"></div>
+                  <div class="arm r"></div>
+                  <div class="torso"></div>
+                  <div class="leg l"><i class="boot"></i></div>
+                  <div class="leg r"><i class="boot"></i></div>
+                </div>
+              </div>
+              <div class="platform" aria-hidden="true"></div>
+            </div>
+            <div class="vignette"></div>
+            <div class="flash"></div>
+            <div class="bonk" id="bonk">Bonk!</div>
+            <div class="result-pop" id="resultPop"></div>
+          </div>
+        </section>
+
+        <section class="dash">
+          <div class="display">
+            <div class="disp-label">Clears</div>
+            <div class="round-read" id="roundRead">0</div>
+            <div class="status-line" id="statusLine">Waiting at the platform</div>
+          </div>
+          <div class="metrics">
+            <div class="metric">
+              <span>Multiplier</span>
+              <strong id="multRead">&mdash;</strong>
+            </div>
+            <div class="metric next">
+              <span>Next clear</span>
+              <strong id="nextRead">&mdash;</strong>
+            </div>
+            <div class="metric payout">
+              <span>Potential payout</span>
+              <strong id="payoutRead">&mdash;</strong>
+            </div>
+          </div>
+          <button class="cashout" id="cashBtn" type="button" disabled>Cash out</button>
+          <div class="auto-row">
+            <label for="autoClear">Auto cash out after clears</label>
+            <input id="autoClear" type="number" min="1" max="30" placeholder="Off" inputmode="numeric" />
+          </div>
+          <div class="history">
+            <h2>Recent runs</h2>
+            <ul id="historyList"></ul>
+          </div>
+        </section>
+      </div>
+
+      <form class="bet-bar" id="betForm">
+        <span class="bet-label">Bet</span>
+        <input class="bet-input" id="betInput" type="number" min="1" step="1" value="50" inputmode="numeric" aria-label="Bet amount" />
+        <div class="chips" id="chips">
+          <button class="chip" type="button" data-bet="10">$10</button>
+          <button class="chip" type="button" data-bet="50">$50</button>
+          <button class="chip" type="button" data-bet="100">$100</button>
+          <button class="chip" type="button" data-bet="250">$250</button>
+          <button class="chip" type="button" data-bet="max">Max</button>
+        </div>
+        <div class="track-picker" id="trackPicker">
+          <span class="bet-label">Tracks</span>
+          <button class="chip" type="button" data-tracks="3">3</button>
+          <button class="chip" type="button" data-tracks="4">4</button>
+          <button class="chip" type="button" data-tracks="5">5</button>
+          <button class="chip" type="button" data-tracks="6">6</button>
+        </div>
+        <p class="odds-hint" id="oddsHint">4 tracks &middot; 3 of 4 are safe &middot; 1.29x a clear</p>
+        <button class="start-btn" id="startBtn" type="submit">Step onto the tracks</button>
+      </form>
+
+      <div class="help">
+        <details>
+          <summary>How to play</summary>
+          <p>
+            This is fake money &mdash; you start with $1,000. Step onto the tracks and pick a tunnel.
+            A train bursts out of one random tunnel. If it isn&rsquo;t yours, you survive and the multiplier goes up.
+            Pick again to keep climbing, or cash out and take your bet times the current multiplier.
+            Get hit and the bet is gone &mdash; cartoony, not gory. More tracks means a safer clear but a smaller step up.
+            The payout is tuned with a small house edge, about 3% per clear.
+          </p>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="brokeOverlay" role="dialog" aria-modal="true" aria-labelledby="brokeTitle">
+    <div class="modal">
+      <h2 id="brokeTitle">Stranded at the platform</h2>
+      <p>You&rsquo;re out of fake cash. Reset the bankroll to $1,000 and try the tunnels again.</p>
+      <button class="start-btn" id="brokeReset" type="button">Reset to $1,000</button>
+    </div>
+  </div>
+
+  <script>
+
+  (function () {
+    "use strict";
+
+    var STARTING_CENTS = 100000;
+    var MIN_BET_CENTS = 100;
+    var HOUSE = 0.97;
+    var MIN_TRACKS = 3;
+    var MAX_TRACKS = 6;
+    var DEFAULT_TRACKS = 4;
+    var STORAGE_KEY = "train-game-v1";
+    var HISTORY_MAX = 8;
+
+    var DELAYS = {
+      walk: 350,
+      rumble: 900,
+      burst: 700,
+      hit: 1000,
+      flourish: 520,
+      result: 600
+    };
+
+    function stepMult(tracks) {
+      return HOUSE * tracks / (tracks - 1);
+    }
+    function multAfter(rounds, tracks) {
+      if (rounds <= 0) return 1;
+      return Math.pow(stepMult(tracks), rounds);
+    }
+
+    var state = {
+      balanceCents: STARTING_CENTS,
+      history: [],
+      muted: false,
+      autoClear: null,
+      tracks: DEFAULT_TRACKS,
+      phase: "idle",
+      round: 0,
+      betCents: 0,
+      multiplier: 1,
+      payoutCents: 0,
+      chosen: null,
+      trainTrack: null
+    };
+
+    var timers = [];
+    var rng = Math.random;
+    var forceSurvive = false;
+    var forceHit = false;
+    var forceTrainTrack = null;
+
+    var app = document.getElementById("app");
+    var yardView = document.getElementById("yardView");
+    var tunnelsEl = document.getElementById("tunnels");
+    var lanesEl = document.getElementById("lanes");
+    var hero = document.getElementById("hero");
+    var balanceRead = document.getElementById("balanceRead");
+    var roundRead = document.getElementById("roundRead");
+    var statusLine = document.getElementById("statusLine");
+    var multRead = document.getElementById("multRead");
+    var nextRead = document.getElementById("nextRead");
+    var payoutRead = document.getElementById("payoutRead");
+    var cashBtn = document.getElementById("cashBtn");
+    var startBtn = document.getElementById("startBtn");
+    var betInput = document.getElementById("betInput");
+    var betForm = document.getElementById("betForm");
+    var autoClearInput = document.getElementById("autoClear");
+    var historyList = document.getElementById("historyList");
+    var muteBtn = document.getElementById("muteBtn");
+    var iconSound = document.getElementById("iconSound");
+    var iconMute = document.getElementById("iconMute");
+    var resetBtn = document.getElementById("resetBtn");
+    var brokeOverlay = document.getElementById("brokeOverlay");
+    var brokeReset = document.getElementById("brokeReset");
+    var resultPop = document.getElementById("resultPop");
+    var oddsHint = document.getElementById("oddsHint");
+
+    function fmtMoney(cents) {
+      var sign = cents < 0 ? "-" : "";
+      var a = Math.abs(Math.round(cents));
+      var d = Math.floor(a / 100);
+      var c = a % 100;
+      return sign + "$" + d.toLocaleString("en-US") + "." + String(c).padStart(2, "0");
+    }
+
+    function fmtMult(m) {
+      if (!isFinite(m)) return "\u2014";
+      if (m >= 1000) return m.toFixed(0) + "x";
+      if (m >= 100) return m.toFixed(1) + "x";
+      return m.toFixed(2) + "x";
+    }
+
+    function later(ms, fn) {
+      var id = setTimeout(fn, ms);
+      timers.push(id);
+      return id;
+    }
+
+    function clearTimers() {
+      for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]);
+      timers = [];
+    }
+
+    function load() {
+      try {
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        var data = JSON.parse(raw);
+        if (typeof data.balanceCents === "number" && data.balanceCents >= 0) {
+          state.balanceCents = Math.round(data.balanceCents);
+        }
+        if (Array.isArray(data.history)) state.history = data.history.slice(0, HISTORY_MAX);
+        if (typeof data.muted === "boolean") state.muted = data.muted;
+        if (typeof data.autoClear === "number" && data.autoClear >= 1 && data.autoClear <= 30) {
+          state.autoClear = data.autoClear;
+        }
+        if (typeof data.tracks === "number" && data.tracks >= MIN_TRACKS && data.tracks <= MAX_TRACKS) {
+          state.tracks = Math.round(data.tracks);
+        }
+      } catch (e) {}
+    }
+
+    function save() {
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            balanceCents: state.balanceCents,
+            history: state.history,
+            muted: state.muted,
+            autoClear: state.autoClear,
+            tracks: state.tracks
+          })
+        );
+      } catch (e) {}
+    }
+
+    function setPhase(phase) {
+      state.phase = phase;
+      app.className = "app is-" + phase;
+    }
+
+    function buildYard() {
+      var n = state.tracks;
+      yardView.style.setProperty("--tracks", String(n));
+      var tunnels = "";
+      var lanes = "";
+      for (var i = 0; i < n; i++) {
+        var label = String(i + 1);
+        tunnels +=
+          '<div class="tunnel" data-track="' + i + '">' +
+            '<div class="signal" aria-hidden="true"></div>' +
+            '<div class="arch"><div class="mouth"></div><span class="tunnel-num">' + label + "</span></div>" +
+          "</div>";
+        lanes +=
+          '<button class="lane" type="button" data-track="' + i + '" aria-label="Track ' + label + '">' +
+            '<span class="lane-hint">' + label + "</span>" +
+            '<span class="rail" aria-hidden="true"></span>' +
+            '<span class="train" aria-hidden="true">' +
+              '<span class="glow"></span>' +
+              '<span class="body">' +
+                '<span class="chimney"></span>' +
+                '<span class="cabin"></span>' +
+                '<span class="boiler"><span class="lamp"></span></span>' +
+                '<span class="cow"></span>' +
+              "</span>" +
+            "</span>" +
+          "</button>";
+      }
+      tunnelsEl.innerHTML = tunnels;
+      lanesEl.innerHTML = lanes;
+    }
+
+    function placeHero(track, instant) {
+      var n = state.tracks;
+      var pct;
+      if (track == null || track < 0) {
+        pct = 50;
+      } else {
+        var col = 88 / n;
+        var start = 6;
+        pct = start + col * (track + 0.5);
+      }
+      if (instant) hero.style.transitionDuration = "0s";
+      hero.style.left = pct + "%";
+      if (instant) {
+        hero.offsetHeight;
+        hero.style.transitionDuration = "";
+      }
+    }
+
+    function clearMarks() {
+      var tunnels = tunnelsEl.querySelectorAll(".tunnel");
+      var lanes = lanesEl.querySelectorAll(".lane");
+      var i;
+      for (i = 0; i < tunnels.length; i++) {
+        tunnels[i].className = "tunnel";
+        var sig = tunnels[i].querySelector(".signal");
+        if (sig) sig.className = "signal";
+      }
+      for (i = 0; i < lanes.length; i++) {
+        lanes[i].className = "lane";
+      }
+    }
+
+    function markChosen(track) {
+      var tun = tunnelsEl.querySelector('.tunnel[data-track="' + track + '"]');
+      var lane = lanesEl.querySelector('.lane[data-track="' + track + '"]');
+      if (tun) tun.classList.add("is-chosen");
+      if (lane) lane.classList.add("is-chosen");
+      var sig = tun && tun.querySelector(".signal");
+      if (sig) sig.classList.add("is-amber");
+    }
+
+    function currentBetCents() {
+      var n = Number(betInput.value);
+      if (!isFinite(n) || n <= 0) return 0;
+      return Math.round(n * 100);
+    }
+
+    function maxBetCents() {
+      return Math.max(0, Math.floor(state.balanceCents / 100) * 100);
+    }
+
+    function clampBet() {
+      var cents = currentBetCents();
+      var max = maxBetCents();
+      if (cents < MIN_BET_CENTS) cents = Math.min(MIN_BET_CENTS, max);
+      if (cents > max) cents = max;
+      if (cents > 0) betInput.value = String(Math.round(cents / 100));
+      return cents;
+    }
+
+    function flashBalance(dir) {
+      balanceRead.classList.remove("is-up", "is-down");
+      void balanceRead.offsetWidth;
+      balanceRead.classList.add(dir === "up" ? "is-up" : "is-down");
+      later(700, function () {
+        balanceRead.classList.remove("is-up", "is-down");
+      });
+    }
+
+    function canCashOut() {
+      return (state.phase === "pick" || state.phase === "safe") && state.round > 0 && state.betCents > 0;
+    }
+
+    function renderStatic() {
+      balanceRead.textContent = fmtMoney(state.balanceCents);
+      iconSound.hidden = state.muted;
+      iconMute.hidden = !state.muted;
+      muteBtn.setAttribute("aria-label", state.muted ? "Unmute sound" : "Mute sound");
+      muteBtn.title = state.muted ? "Unmute" : "Mute";
+      if (state.autoClear) autoClearInput.value = String(state.autoClear);
+      else if (document.activeElement !== autoClearInput) autoClearInput.value = "";
+
+      var bet = currentBetCents();
+      var chips = document.querySelectorAll("#chips .chip");
+      for (var i = 0; i < chips.length; i++) {
+        var val = chips[i].getAttribute("data-bet");
+        var on = val === "max" ? bet === maxBetCents() && bet > 0 : Number(val) * 100 === bet;
+        chips[i].classList.toggle("is-on", on);
+        var need = val === "max" ? MIN_BET_CENTS : Number(val) * 100;
+        chips[i].disabled = state.phase !== "idle" || state.balanceCents < need;
+      }
+
+      var tBtns = document.querySelectorAll("#trackPicker [data-tracks]");
+      for (var t = 0; t < tBtns.length; t++) {
+        var tn = Number(tBtns[t].getAttribute("data-tracks"));
+        tBtns[t].classList.toggle("is-on", tn === state.tracks);
+        tBtns[t].disabled = state.phase !== "idle";
+      }
+
+      var sm = stepMult(state.tracks);
+      oddsHint.textContent =
+        state.tracks + " tracks \u00b7 " + (state.tracks - 1) + " of " + state.tracks +
+        " are safe \u00b7 " + fmtMult(sm) + " a clear";
+
+      var canStart =
+        state.phase === "idle" &&
+        state.balanceCents >= MIN_BET_CENTS &&
+        bet >= MIN_BET_CENTS &&
+        bet <= state.balanceCents;
+      startBtn.disabled = !canStart;
+      betInput.disabled = state.phase !== "idle";
+      autoClearInput.disabled = !(state.phase === "idle" || state.phase === "pick" || state.phase === "safe");
+
+      cashBtn.disabled = !canCashOut();
+      if (canCashOut()) {
+        cashBtn.textContent = "Cash out  \u00b7  " + fmtMoney(Math.round(state.betCents * state.multiplier));
+      } else {
+        cashBtn.textContent = "Cash out";
+      }
+      brokeOverlay.classList.toggle("show", state.phase === "idle" && state.balanceCents < MIN_BET_CENTS);
+
+      var lanes = lanesEl.querySelectorAll(".lane");
+      for (var L = 0; L < lanes.length; L++) {
+        lanes[L].disabled = state.phase !== "pick";
+      }
+
+      if (!state.history.length) {
+        historyList.innerHTML = '<li class="empty" style="display:block">No runs yet. The tunnels are quiet.</li>';
+      } else {
+        historyList.innerHTML = state.history
+          .map(function (h) {
+            var hit = h.result === "hit";
+            var resCls = hit ? "res-hit" : "res-cash";
+            var res = hit ? "HIT" : "CASH";
+            var pay = hit ? "\u2212" + fmtMoney(h.bet) : "+" + fmtMoney(h.payout);
+            return (
+              "<li>" +
+              "<span>R" + (h.round || 0) + "</span>" +
+              "<span>" + (h.tracks || state.tracks) + "T</span>" +
+              '<span class="' + resCls + '">' + res + "</span>" +
+              "<span>" + (hit ? "\u2014" : fmtMult(h.multiplier)) + "</span>" +
+              '<span class="' + resCls + '">' + pay + "</span>" +
+              "</li>"
+            );
+          })
+          .join("");
+      }
+    }
+
+    function renderRide() {
+      roundRead.textContent = String(state.round);
+      var payoutEl = payoutRead.closest(".metric");
+      var next = multAfter(state.round + 1, state.tracks);
+      if (state.phase === "idle" && !state.betCents) {
+        multRead.textContent = "\u2014";
+        nextRead.textContent = fmtMult(stepMult(state.tracks));
+        var previewBet = currentBetCents();
+        if (previewBet >= MIN_BET_CENTS) {
+          payoutRead.textContent = fmtMoney(Math.round(previewBet * stepMult(state.tracks)));
+          if (payoutEl) payoutEl.classList.add("has-value");
+        } else {
+          payoutRead.textContent = "\u2014";
+          if (payoutEl) payoutEl.classList.remove("has-value");
+        }
+      } else {
+        var cur = state.round > 0 ? state.multiplier : 1;
+        multRead.textContent = state.round > 0 ? fmtMult(cur) : "1.00x";
+        nextRead.textContent = fmtMult(next);
+        if (state.round > 0) {
+          payoutRead.textContent = fmtMoney(Math.round(state.betCents * state.multiplier));
+          if (payoutEl) payoutEl.classList.add("has-value");
+        } else {
+          payoutRead.textContent = fmtMoney(Math.round(state.betCents * next)) + " if clear";
+          if (payoutEl) payoutEl.classList.add("has-value");
+        }
+      }
+    }
+
+    function setStatus(text) {
+      statusLine.textContent = text;
+    }
+
+    function showResult(text, win) {
+      resultPop.textContent = text;
+      resultPop.className = "result-pop show " + (win ? "win" : "lose");
+    }
+
+    function hideResult() {
+      resultPop.className = "result-pop";
+      resultPop.textContent = "";
+    }
+
+    var audioCtx = null;
+
+    function ctx() {
+      if (!audioCtx) {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        audioCtx = new AC();
+      }
+      if (audioCtx.state === "suspended") audioCtx.resume();
+      return audioCtx;
+    }
+
+    function beep(freq, dur, type, gain, at, slide) {
+      if (state.muted) return;
+      var c = ctx();
+      if (!c) return;
+      var t0 = c.currentTime + (at || 0);
+      var o = c.createOscillator();
+      var g = c.createGain();
+      o.type = type || "sine";
+      o.frequency.setValueAtTime(freq, t0);
+      if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(20, slide), t0 + dur);
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(gain || 0.08, t0 + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      o.connect(g);
+      g.connect(c.destination);
+      o.start(t0);
+      o.stop(t0 + dur + 0.02);
+    }
+
+    function noiseBurst(dur, gain, freq) {
+      if (state.muted) return;
+      var c = ctx();
+      if (!c) return;
+      var n = c.createBuffer(1, Math.floor(c.sampleRate * dur), c.sampleRate);
+      var d = n.getChannelData(0);
+      for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      var src = c.createBufferSource();
+      src.buffer = n;
+      var f = c.createBiquadFilter();
+      f.type = "bandpass";
+      f.frequency.value = freq || 400;
+      f.Q.value = 0.7;
+      var g = c.createGain();
+      var t0 = c.currentTime;
+      g.gain.setValueAtTime(gain || 0.12, t0);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      src.connect(f);
+      f.connect(g);
+      g.connect(c.destination);
+      src.start(t0);
+      src.stop(t0 + dur);
+    }
+
+    var sfx = {
+      click: function () { beep(880, 0.04, "square", 0.04); },
+      start: function () { beep(330, 0.1, "sine", 0.05); beep(440, 0.14, "sine", 0.05, 0.1); },
+      step: function () { noiseBurst(0.08, 0.05, 180); beep(140, 0.08, "sine", 0.03); },
+      rumble: function () {
+        noiseBurst(0.85, 0.1, 90);
+        beep(55, 0.8, "sine", 0.06, 0, 36);
+        beep(70, 0.7, "triangle", 0.04, 0.1, 40);
+      },
+      whistle: function () {
+        beep(620, 0.18, "sine", 0.06);
+        beep(780, 0.35, "sine", 0.07, 0.14);
+      },
+      approach: function () {
+        noiseBurst(0.55, 0.14, 220);
+        beep(180, 0.5, "sawtooth", 0.05, 0, 90);
+      },
+      pass: function () {
+        noiseBurst(0.35, 0.12, 500);
+        beep(280, 0.3, "sawtooth", 0.05, 0, 90);
+      },
+      hit: function () {
+        noiseBurst(0.28, 0.2, 140);
+        beep(180, 0.22, "square", 0.08, 0, 70);
+        beep(90, 0.3, "sine", 0.1, 0.04);
+      },
+      bonk: function () {
+        beep(220, 0.12, "square", 0.08);
+        beep(140, 0.18, "triangle", 0.07, 0.1);
+      },
+      clear: function () {
+        beep(523, 0.1, "sine", 0.06);
+        beep(784, 0.16, "sine", 0.07, 0.1);
+      },
+      cash: function () {
+        beep(523, 0.14, "sine", 0.07);
+        beep(659, 0.14, "sine", 0.07, 0.08);
+        beep(784, 0.14, "sine", 0.07, 0.16);
+        beep(1046, 0.28, "sine", 0.08, 0.24);
+      }
+    };
+
+    function rollTrainTrack() {
+      var n = state.tracks;
+      var chosen = state.chosen;
+      if (forceTrainTrack != null && forceTrainTrack >= 0 && forceTrainTrack < n) {
+        return forceTrainTrack;
+      }
+      if (forceHit) return chosen;
+      if (forceSurvive) {
+        if (n <= 1) return (chosen + 1) % n;
+        var safe = Math.floor(rng() * (n - 1));
+        return safe >= chosen ? safe + 1 : safe;
+      }
+      return Math.floor(rng() * n);
+    }
+
+    function startRun(betCents) {
+      if (state.phase !== "idle") return false;
+      betCents = Math.round(betCents);
+      if (betCents < MIN_BET_CENTS || betCents > state.balanceCents) return false;
+      hideResult();
+      clearTimers();
+      ctx();
+      state.betCents = betCents;
+      state.balanceCents -= betCents;
+      state.round = 0;
+      state.multiplier = 1;
+      state.payoutCents = 0;
+      state.chosen = null;
+      state.trainTrack = null;
+      save();
+      flashBalance("down");
+      clearMarks();
+      placeHero(null, false);
+      renderStatic();
+      renderRide();
+      setPhase("pick");
+      setStatus("Pick a track");
+      sfx.start();
+      return true;
+    }
+
+    function pickTrack(index) {
+      index = Number(index);
+      if (state.phase !== "pick") return false;
+      if (!isFinite(index) || index < 0 || index >= state.tracks) return false;
+      hideResult();
+      clearTimers();
+      state.chosen = index;
+      state.trainTrack = null;
+      clearMarks();
+      markChosen(index);
+      setPhase("commit");
+      setStatus("Committing to track " + (index + 1) + "\u2026");
+      sfx.step();
+      placeHero(index, false);
+      renderStatic();
+      renderRide();
+      later(DELAYS.walk, beginRumble);
+      return true;
+    }
+
+    function beginRumble() {
+      if (state.phase !== "commit") return;
+      setPhase("rumble");
+      setStatus("The tunnels rumble\u2026");
+      sfx.rumble();
+      later(120, sfx.whistle);
+      renderStatic();
+      later(DELAYS.rumble, burstTrain);
+    }
+
+    function burstTrain() {
+      if (state.phase !== "rumble") return;
+      var train = rollTrainTrack();
+      state.trainTrack = train;
+      setPhase("burst");
+      setStatus("A train bursts out of tunnel " + (train + 1) + "!");
+      var tun = tunnelsEl.querySelector('.tunnel[data-track="' + train + '"]');
+      var lane = lanesEl.querySelector('.lane[data-track="' + train + '"]');
+      var hit = train === state.chosen;
+      if (tun) {
+        var sig = tun.querySelector(".signal");
+        if (sig) sig.className = "signal is-red";
+      }
+      if (lane) {
+        lane.classList.add(hit ? "is-bursting" : "is-passing");
+        lane.classList.add(hit ? "is-danger" : "is-safe");
+      }
+      sfx.approach();
+      renderStatic();
+      later(DELAYS.burst, function () {
+        if (hit) beginHit();
+        else beginSurvive();
+      });
+    }
+
+    function beginSurvive() {
+      if (state.phase !== "burst") return;
+      state.round += 1;
+      state.multiplier = multAfter(state.round, state.tracks);
+      setPhase("safe");
+      sfx.pass();
+      later(60, sfx.clear);
+      var tuns = tunnelsEl.querySelectorAll(".tunnel");
+      for (var i = 0; i < tuns.length; i++) {
+        var tr = Number(tuns[i].getAttribute("data-track"));
+        var sig = tuns[i].querySelector(".signal");
+        if (!sig) continue;
+        if (tr === state.trainTrack) sig.className = "signal is-red";
+        else if (tr === state.chosen) sig.className = "signal is-green";
+        else sig.className = "signal";
+      }
+      setStatus("Clear! Multiplier " + fmtMult(state.multiplier));
+      showResult("Clear  \u00b7  " + fmtMult(state.multiplier), true);
+      renderStatic();
+      renderRide();
+      if (state.autoClear && state.round >= state.autoClear) {
+        later(Math.min(DELAYS.flourish, 280), function () { cashOut(); });
+        return;
+      }
+      later(DELAYS.flourish, function () {
+        hideResult();
+        clearMarks();
+        markChosen(state.chosen);
+        setPhase("pick");
+        setStatus("Pick again, or cash out");
+        renderStatic();
+        renderRide();
+      });
+    }
+
+    function beginHit() {
+      if (state.phase !== "burst") return;
+      var lane = lanesEl.querySelector('.lane[data-track="' + state.trainTrack + '"]');
+      if (lane) {
+        lane.classList.remove("is-bursting");
+        lane.classList.add("is-impact");
+      }
+      setPhase("hit");
+      sfx.hit();
+      later(80, sfx.bonk);
+      setStatus("Hit on track " + (state.chosen + 1) + " \u00b7 bet lost");
+      showResult("Hit on track " + (state.chosen + 1), false);
+      pushHistory("hit");
+      renderStatic();
+      renderRide();
+      later(DELAYS.hit + DELAYS.result, finishToIdle);
+    }
+
+    function cashOut() {
+      if (!canCashOut()) return false;
+      clearTimers();
+      var payout = Math.round(state.betCents * state.multiplier);
+      state.payoutCents = payout;
+      state.balanceCents += payout;
+      save();
+      setPhase("cashed");
+      sfx.cash();
+      setStatus("Cashed out after " + state.round + " clear" + (state.round === 1 ? "" : "s") + " \u00b7 " + fmtMult(state.multiplier));
+      showResult("Cashed out  " + fmtMoney(payout), true);
+      pushHistory("cash");
+      flashBalance("up");
+      renderStatic();
+      renderRide();
+      later(DELAYS.result + 900, finishToIdle);
+      return true;
+    }
+
+    function pushHistory(result) {
+      state.history.unshift({
+        round: state.round,
+        result: result,
+        bet: state.betCents,
+        payout: result === "hit" ? 0 : state.payoutCents,
+        multiplier: state.multiplier,
+        tracks: state.tracks,
+        ts: Date.now()
+      });
+      state.history = state.history.slice(0, HISTORY_MAX);
+      save();
+    }
+
+    function finishToIdle() {
+      clearTimers();
+      setPhase("idle");
+      state.round = 0;
+      state.betCents = 0;
+      state.multiplier = 1;
+      state.chosen = null;
+      state.trainTrack = null;
+      state.payoutCents = 0;
+      hideResult();
+      clearMarks();
+      placeHero(null, false);
+      if (state.balanceCents < MIN_BET_CENTS) setStatus("Stranded at the platform");
+      else setStatus("Waiting at the platform");
+      renderStatic();
+      renderRide();
+    }
+
+    function resetBankroll(force) {
+      if (!force && state.phase !== "idle") return;
+      if (!force && state.balanceCents === STARTING_CENTS) return;
+      if (
+        !force &&
+        state.balanceCents >= MIN_BET_CENTS &&
+        !window.confirm("Reset your fake bankroll back to $1,000?")
+      ) {
+        return;
+      }
+      clearTimers();
+      hideResult();
+      state.balanceCents = STARTING_CENTS;
+      state.round = 0;
+      state.betCents = 0;
+      state.multiplier = 1;
+      state.chosen = null;
+      state.trainTrack = null;
+      save();
+      setPhase("idle");
+      clearMarks();
+      placeHero(null, true);
+      setStatus("Bankroll reset \u2014 waiting at the platform");
+      if (Number(betInput.value) * 100 > state.balanceCents || !betInput.value) betInput.value = "50";
+      renderStatic();
+      renderRide();
+    }
+
+    function setTracks(n) {
+      n = Math.round(Number(n));
+      if (n < MIN_TRACKS || n > MAX_TRACKS) return false;
+      if (state.phase !== "idle") return false;
+      state.tracks = n;
+      save();
+      buildYard();
+      placeHero(null, true);
+      renderStatic();
+      renderRide();
+      return true;
+    }
+
+    betForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var cents = clampBet();
+      startRun(cents);
+    });
+
+    document.getElementById("chips").addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-bet]");
+      if (!btn || btn.disabled) return;
+      sfx.click();
+      var val = btn.getAttribute("data-bet");
+      if (val === "max") betInput.value = String(Math.max(1, Math.floor(state.balanceCents / 100)));
+      else betInput.value = val;
+      renderStatic();
+      renderRide();
+    });
+
+    document.getElementById("trackPicker").addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-tracks]");
+      if (!btn || btn.disabled) return;
+      sfx.click();
+      setTracks(btn.getAttribute("data-tracks"));
+    });
+
+    lanesEl.addEventListener("click", function (e) {
+      var btn = e.target.closest(".lane");
+      if (!btn || btn.disabled) return;
+      pickTrack(btn.getAttribute("data-track"));
+    });
+
+    betInput.addEventListener("input", function () { renderStatic(); renderRide(); });
+    betInput.addEventListener("change", function () { clampBet(); renderStatic(); renderRide(); });
+
+    cashBtn.addEventListener("click", function () {
+      cashOut();
+    });
+
+    muteBtn.addEventListener("click", function () {
+      state.muted = !state.muted;
+      if (!state.muted) ctx();
+      save();
+      renderStatic();
+    });
+
+    resetBtn.addEventListener("click", function () { resetBankroll(false); });
+    brokeReset.addEventListener("click", function () { resetBankroll(true); });
+
+    autoClearInput.addEventListener("change", function () {
+      var v = Number(autoClearInput.value);
+      if (!autoClearInput.value || !isFinite(v) || v < 1) {
+        state.autoClear = null;
+        autoClearInput.value = "";
+      } else {
+        state.autoClear = Math.min(30, Math.max(1, Math.round(v)));
+        autoClearInput.value = String(state.autoClear);
+      }
+      save();
+      if (canCashOut() && state.autoClear && state.round >= state.autoClear) {
+        cashOut();
+      }
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
+      if (e.code === "Space" || e.key === " ") {
+        if (canCashOut()) {
+          e.preventDefault();
+          cashOut();
+        }
+      }
+      var num = e.key && e.key.length === 1 ? Number(e.key) : NaN;
+      if (num >= 1 && num <= state.tracks && state.phase === "pick") {
+        e.preventDefault();
+        pickTrack(num - 1);
+      }
+    });
+
+    document.addEventListener(
+      "pointerdown",
+      function () {
+        if (!state.muted) ctx();
+      },
+      { once: true }
+    );
+
+    load();
+    buildYard();
+    if (state.balanceCents < MIN_BET_CENTS) {
+      /* keep broke state visible */
+    } else if (!betInput.value) {
+      betInput.value = "50";
+    }
+    if (Number(betInput.value) * 100 > state.balanceCents && state.balanceCents >= MIN_BET_CENTS) {
+      betInput.value = String(Math.floor(state.balanceCents / 100));
+    }
+    placeHero(null, true);
+    setPhase("idle");
+    setStatus(state.balanceCents < MIN_BET_CENTS ? "Stranded at the platform" : "Waiting at the platform");
+    renderStatic();
+    renderRide();
+
+    window.__train = {
+      getState: function () {
+        return {
+          balanceCents: state.balanceCents,
+          round: state.round,
+          multiplier: state.multiplier,
+          nextMultiplier: multAfter(state.round + 1, state.tracks),
+          phase: state.phase,
+          betCents: state.betCents,
+          tracks: state.tracks,
+          chosen: state.chosen,
+          trainTrack: state.trainTrack,
+          history: state.history.slice(),
+          muted: state.muted,
+          autoClear: state.autoClear,
+          stepMult: stepMult(state.tracks)
+        };
+      },
+      setBalance: function (dollars) {
+        state.balanceCents = Math.round(Number(dollars) * 100);
+        save();
+        renderStatic();
+      },
+      setMuted: function (m) {
+        state.muted = !!m;
+        save();
+        renderStatic();
+      },
+      setDelays: function (obj) {
+        if (!obj) return;
+        for (var k in DELAYS) if (Object.prototype.hasOwnProperty.call(obj, k)) DELAYS[k] = obj[k];
+      },
+      setForceSurvive: function (v) { forceSurvive = !!v; if (v) { forceHit = false; forceTrainTrack = null; } },
+      setForceHit: function (v) { forceHit = !!v; if (v) { forceSurvive = false; forceTrainTrack = null; } },
+      setForceTrainTrack: function (n) { forceTrainTrack = n == null ? null : Number(n); forceSurvive = false; forceHit = false; },
+      setRng: function (fn) { rng = fn || Math.random; },
+      setTracks: function (n) { return setTracks(n); },
+      startRun: function (dollars) {
+        betInput.value = String(dollars);
+        return startRun(Math.round(Number(dollars) * 100));
+      },
+      pickTrack: function (n) { return pickTrack(n); },
+      cashOut: function () { return cashOut(); },
+      reset: function () { resetBankroll(true); },
+      setHistory: function (rows) {
+        state.history = Array.isArray(rows) ? rows.slice(0, HISTORY_MAX) : [];
+        save();
+        renderStatic();
+      },
+      holdMid: function (opts) {
+        opts = opts || {};
+        clearTimers();
+        hideResult();
+        if (opts.tracks) {
+          state.tracks = Math.max(MIN_TRACKS, Math.min(MAX_TRACKS, Math.round(opts.tracks)));
+          buildYard();
+        }
+        if (state.phase === "idle" || !state.betCents) {
+          var bet = Math.round(Number(opts.bet != null ? opts.bet : 50) * 100);
+          if (bet > state.balanceCents) bet = maxBetCents();
+          if (bet >= MIN_BET_CENTS && state.phase === "idle") {
+            state.betCents = bet;
+            state.balanceCents -= bet;
+            save();
+          } else if (!state.betCents) {
+            state.betCents = bet;
+          }
+        }
+        state.round = opts.rounds != null ? Math.max(0, Math.round(opts.rounds)) : 3;
+        state.multiplier = multAfter(state.round, state.tracks);
+        state.chosen = opts.track != null ? Number(opts.track) : 1;
+        state.trainTrack = null;
+        clearMarks();
+        markChosen(state.chosen);
+        placeHero(state.chosen, true);
+        renderStatic();
+        renderRide();
+        var mode = opts.mode || "rumble";
+        if (mode === "pick" || mode === "safe") {
+          setPhase(mode === "safe" ? "safe" : "pick");
+          setStatus(state.round ? "Pick again, or cash out" : "Pick a track");
+          renderStatic();
+          renderRide();
+        } else {
+          setPhase("rumble");
+          setStatus("The tunnels rumble\u2026");
+          renderStatic();
+          renderRide();
+          DELAYS.rumble = opts.rumbleMs || 60000;
+          later(DELAYS.rumble, burstTrain);
+        }
+      }
+    };
+  })();
+  </script>
+</body>
+</html>
