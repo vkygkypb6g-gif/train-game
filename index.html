@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#151a20" />
   <meta name="description" content="Pick a railway track, dodge the train, and cash out with fake money." />
   <title>Tunnels</title>
-  <!-- tunnels-v4-slate -->
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231a2027'/%3E%3Ccircle cx='16' cy='18' r='8' fill='%236b4a36'/%3E%3Ccircle cx='16' cy='12' r='5' fill='%23805a48'/%3E%3Ccircle cx='16' cy='12' r='2' fill='%23f4a8b8'/%3E%3C/svg%3E" />
+  <!-- tunnels-v5-chicken -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231a2027'/%3E%3Cellipse cx='16' cy='19' rx='8' ry='7' fill='%23f3c43a'/%3E%3Ccircle cx='16' cy='12' r='5.5' fill='%23f6cc4a'/%3E%3Cpolygon points='16,4 13,10 19,10' fill='%23f08c28'/%3E%3Ccircle cx='14' cy='12' r='1.1' fill='%231a1410'/%3E%3Ccircle cx='18' cy='12' r='1.1' fill='%231a1410'/%3E%3Cpath d='M13 8 q3 -5 6 0' fill='%23e4453a'/%3E%3C/svg%3E" />
   <style>
     :root {
       --bg: #151a20;
@@ -294,6 +294,41 @@
     .app.is-safe .status-bar, .app.is-cashed .status-bar { color: var(--green); }
     .app.is-hit .status-bar { color: var(--danger); }
 
+    .mult-hud {
+      flex: 0 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      padding: 8px 12px 10px;
+      background: rgba(18,22,27,0.92);
+      border-bottom: 1px solid var(--line);
+    }
+    .mult-item {
+      background: var(--board);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 6px 10px;
+      text-align: center;
+      min-width: 0;
+    }
+    .mult-item span {
+      display: block;
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .mult-item strong {
+      display: block;
+      margin-top: 2px;
+      font-family: var(--font-num);
+      font-size: 1.05rem;
+    }
+    .mult-item.is-current strong { color: var(--text); }
+    .mult-item.is-current.has-run strong { color: var(--green); }
+    .mult-item.is-next strong { color: var(--blue-hi); }
+
     .yard-view {
       position: relative;
       flex: 1;
@@ -318,42 +353,23 @@
     }
     .pad {
       position: absolute;
-      width: 40px;
-      height: 40px;
-      margin-left: -20px;
-      margin-top: -20px;
+      width: 52px;
+      height: 52px;
+      margin-left: -26px;
+      margin-top: -26px;
       border-radius: 50%;
       background: #2c333d;
       border: 3px solid #4a5360;
-      box-shadow: inset 0 0 0 3px #232a32, 0 2px 6px rgba(0,0,0,0.35);
+      box-shadow: inset 0 0 0 4px #232a32, 0 2px 6px rgba(0,0,0,0.35);
     }
     .pad::after {
       content: "";
       position: absolute;
-      inset: 8px;
+      inset: 10px;
       border-radius: 50%;
       border: 2px solid #3d4550;
     }
-    .pad.is-next { border-color: var(--blue); box-shadow: inset 0 0 0 4px #232a32, 0 0 0 3px rgba(59,130,246,0.35); }
-    .pad.is-done { border-color: #3d6a52; background: #243830; }
-    .pad.is-here { border-color: var(--blue-hi); background: #24344c; }
-    .pill {
-      position: absolute;
-      transform: translate(-50%, -50%);
-      z-index: 4;
-      pointer-events: none;
-      background: var(--pill);
-      color: #d5dde6;
-      font-family: var(--font-num);
-      font-size: 0.68rem;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.06);
-      white-space: nowrap;
-    }
-    .pill.is-next { background: #1f3a6b; color: #dbeafe; border-color: rgba(59,130,246,0.45); }
-    .pill.is-done { background: #1d3b2c; color: #b7f0ce; }
+    .pad.is-here { border-color: var(--blue-hi); background: #24344c; box-shadow: inset 0 0 0 4px #232a32, 0 0 0 3px rgba(59,130,246,0.35); }
 
     .hits { position: absolute; inset: 0; z-index: 6; }
     .hit {
@@ -373,38 +389,37 @@
     .hit.is-danger { background: rgba(240,89,77,0.10); }
     .hit.is-safe { background: rgba(47,191,113,0.08); }
 
-    .mole {
+    .chicken {
       position: absolute;
       width: 78px;
       height: 86px;
       margin-left: -39px;
       margin-top: -43px;
       z-index: 8;
-      transition: left 0.32s cubic-bezier(0.22, 0.8, 0.28, 1), top 0.32s cubic-bezier(0.22, 0.8, 0.28, 1);
+      transition: left 0.32s cubic-bezier(0.22, 0.8, 0.28, 1);
       filter: drop-shadow(0 6px 4px rgba(0,0,0,0.45));
       pointer-events: none;
     }
-    .mole svg { width: 100%; height: 100%; display: block; overflow: visible; }
-    .app.is-commit .mole { animation: moleWalk 0.32s ease; }
-    .app.is-safe .mole { animation: moleHop 0.42s ease; }
-    .app.is-hit .mole { animation: moleYeet 0.9s cubic-bezier(0.2, 0.7, 0.35, 1) forwards; }
-    .app.is-hit .mole .eyes-ok { display: none; }
-    .app.is-hit .mole .eyes-hit { display: block !important; }
-    .app.is-hit .mole .stars { opacity: 1; animation: orbit 0.7s linear infinite; }
-    .mole .eyes-hit, .mole .stars { display: none; }
-    .app.is-hit .mole .stars { display: block; opacity: 1; }
+    .chicken svg { width: 100%; height: 100%; display: block; overflow: visible; }
+    .app.is-commit .chicken { animation: chickenWalk 0.32s ease; }
+    .app.is-safe .chicken { animation: chickenHop 0.42s ease; }
+    .app.is-hit .chicken { animation: chickenYeet 0.9s cubic-bezier(0.2, 0.7, 0.35, 1) forwards; }
+    .app.is-hit .chicken .eyes-ok { display: none; }
+    .app.is-hit .chicken .eyes-hit { display: block !important; }
+    .app.is-hit .chicken .stars { opacity: 1; animation: orbit 0.7s linear infinite; }
+    .chicken .eyes-hit, .chicken .stars { display: none; }
+    .app.is-hit .chicken .stars { display: block; opacity: 1; }
 
     .train {
       position: absolute;
-      width: 92px;
-      height: 200px;
-      margin-left: -46px;
-      margin-top: -100px;
+      width: 70px;
+      height: 72%;
+      margin-left: -35px;
       z-index: 9;
       opacity: 0;
-      transform: scale(0.85);
-      transform-origin: 50% 50%;
-      filter: drop-shadow(0 10px 10px rgba(0,0,0,0.55));
+      transform: translateY(-100%);
+      transform-origin: 50% 100%;
+      filter: drop-shadow(0 10px 12px rgba(0,0,0,0.55));
       pointer-events: none;
     }
     .train svg { width: 100%; height: 100%; display: block; overflow: visible; }
@@ -412,8 +427,8 @@
     .pick-hint {
       position: absolute;
       left: 50%;
-      bottom: 14px;
-      transform: translateX(-50%);
+      top: 46%;
+      transform: translate(-50%, -50%);
       z-index: 11;
       pointer-events: none;
       background: rgba(26,32,39,0.9);
@@ -477,15 +492,15 @@
     .app.is-burst .board-wrap { animation: shake 0.12s linear infinite; }
     .app.is-hit .board-wrap { animation: impact 0.45s ease-out; }
 
-    @keyframes moleWalk {
+    @keyframes chickenWalk {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-4px); }
     }
-    @keyframes moleHop {
+    @keyframes chickenHop {
       0%, 100% { transform: translateY(0) scale(1); }
       40% { transform: translateY(-12px) scale(1.05); }
     }
-    @keyframes moleYeet {
+    @keyframes chickenYeet {
       0% { transform: translateY(0) rotate(0); }
       30% { transform: translateY(-80px) rotate(-24deg); }
       100% { transform: translateY(10px) rotate(-14deg); }
@@ -507,10 +522,11 @@
       .shell { grid-template-columns: 1fr; }
       .board-wrap { order: 1; min-height: 0; height: 52vh; height: 52dvh; }
       .sidebar { order: 2; }
-      .pad { width: 32px; height: 32px; margin-left: -16px; margin-top: -16px; }
-      .mole { width: 64px; height: 70px; margin-left: -32px; margin-top: -35px; }
-      .train { width: 70px; height: 152px; margin-left: -35px; margin-top: -76px; }
-      .pill { font-size: 0.6rem; padding: 2px 6px; }
+      .pad { width: 40px; height: 40px; margin-left: -20px; margin-top: -20px; }
+      .chicken { width: 64px; height: 70px; margin-left: -32px; margin-top: -35px; }
+      .train { width: 52px; height: 72%; margin-left: -26px; }
+      .mult-item strong { font-size: 0.9rem; }
+      .mult-hud { padding: 6px 8px 8px; gap: 6px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -583,6 +599,20 @@
 
       <section class="board-wrap" aria-label="Railway tracks">
         <div class="status-bar" id="statusLine">Waiting at the platform</div>
+        <div class="mult-hud" id="multHud">
+          <div class="mult-item">
+            <span>Clears</span>
+            <strong id="clearRead">0</strong>
+          </div>
+          <div class="mult-item is-current" id="curMultBox">
+            <span>Current</span>
+            <strong id="curMult">1.00×</strong>
+          </div>
+          <div class="mult-item is-next">
+            <span>Next clear</span>
+            <strong id="nextMult">1.46×</strong>
+          </div>
+        </div>
         <div class="yard-view" id="yardView">
           <svg class="board-art" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
         <rect width="1000" height="1000" fill="#1a2027"/>
@@ -713,182 +743,265 @@
         <circle cx="893" cy="907" r="6" fill="#2fbf71"/>
       </svg>
           <div class="pads" id="pads">
-            <div class="pad" data-step="1" data-track="0" style="left:22%; top:80.0%;"></div>
-            <div class="pad" data-step="1" data-track="1" style="left:50%; top:80.0%;"></div>
-            <div class="pad" data-step="1" data-track="2" style="left:78%; top:80.0%;"></div>
-            <div class="pill" data-step="1" style="left:93.5%; top:80.0%;"></div>
-            <div class="pad" data-step="2" data-track="0" style="left:22%; top:72.0%;"></div>
-            <div class="pad" data-step="2" data-track="1" style="left:50%; top:72.0%;"></div>
-            <div class="pad" data-step="2" data-track="2" style="left:78%; top:72.0%;"></div>
-            <div class="pill" data-step="2" style="left:93.5%; top:72.0%;"></div>
-            <div class="pad" data-step="3" data-track="0" style="left:22%; top:64.0%;"></div>
-            <div class="pad" data-step="3" data-track="1" style="left:50%; top:64.0%;"></div>
-            <div class="pad" data-step="3" data-track="2" style="left:78%; top:64.0%;"></div>
-            <div class="pill" data-step="3" style="left:93.5%; top:64.0%;"></div>
-            <div class="pad" data-step="4" data-track="0" style="left:22%; top:56.0%;"></div>
-            <div class="pad" data-step="4" data-track="1" style="left:50%; top:56.0%;"></div>
-            <div class="pad" data-step="4" data-track="2" style="left:78%; top:56.0%;"></div>
-            <div class="pill" data-step="4" style="left:93.5%; top:56.0%;"></div>
-            <div class="pad" data-step="5" data-track="0" style="left:22%; top:48.0%;"></div>
-            <div class="pad" data-step="5" data-track="1" style="left:50%; top:48.0%;"></div>
-            <div class="pad" data-step="5" data-track="2" style="left:78%; top:48.0%;"></div>
-            <div class="pill" data-step="5" style="left:93.5%; top:48.0%;"></div>
-            <div class="pad" data-step="6" data-track="0" style="left:22%; top:40.0%;"></div>
-            <div class="pad" data-step="6" data-track="1" style="left:50%; top:40.0%;"></div>
-            <div class="pad" data-step="6" data-track="2" style="left:78%; top:40.0%;"></div>
-            <div class="pill" data-step="6" style="left:93.5%; top:40.0%;"></div>
-            <div class="pad" data-step="7" data-track="0" style="left:22%; top:32.0%;"></div>
-            <div class="pad" data-step="7" data-track="1" style="left:50%; top:32.0%;"></div>
-            <div class="pad" data-step="7" data-track="2" style="left:78%; top:32.0%;"></div>
-            <div class="pill" data-step="7" style="left:93.5%; top:32.0%;"></div>
-            <div class="pad" data-step="8" data-track="0" style="left:22%; top:24.0%;"></div>
-            <div class="pad" data-step="8" data-track="1" style="left:50%; top:24.0%;"></div>
-            <div class="pad" data-step="8" data-track="2" style="left:78%; top:24.0%;"></div>
-            <div class="pill" data-step="8" style="left:93.5%; top:24.0%;"></div>
+            <div class="pad" data-track="0" style="left:22%; top:78%;"></div>
+            <div class="pad" data-track="1" style="left:50%; top:78%;"></div>
+            <div class="pad" data-track="2" style="left:78%; top:78%;"></div>
           </div>
           <div class="train" id="train0" aria-hidden="true">
-              <svg viewBox="0 0 90 200" overflow="visible">
+              <svg viewBox="0 0 90 720" overflow="visible" preserveAspectRatio="xMidYMid meet">
                 <defs>
-                  <radialGradient id="beam0" cx="50%" cy="18%" r="80%">
+                  <radialGradient id="beam0" cx="50%" cy="20%" r="80%">
                     <stop offset="0%" stop-color="#dbeafe" stop-opacity="0.95"/>
-                    <stop offset="35%" stop-color="#60a5fa" stop-opacity="0.45"/>
+                    <stop offset="40%" stop-color="#60a5fa" stop-opacity="0.4"/>
                     <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
                   </radialGradient>
                 </defs>
-                <!-- soft headlight glow toward the mole (down the track) -->
-                <ellipse cx="45" cy="188" rx="34" ry="40" fill="url(#beam0)"/>
-                <!-- rear carriage -->
-                <rect x="18" y="8" width="54" height="70" rx="10" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
-                <rect x="24" y="18" width="18" height="16" rx="3" fill="#7dd3fc"/>
-                <rect x="48" y="18" width="18" height="16" rx="3" fill="#7dd3fc"/>
-                <rect x="24" y="42" width="18" height="16" rx="3" fill="#7dd3fc"/>
-                <rect x="48" y="42" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                
+                <rect x="16" y="4" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="16" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="16" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="40" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="40" width="18" height="16" rx="3" fill="#7dd3fc"/>
                 <rect x="22" y="64" width="46" height="6" rx="2" fill="#3b82f6"/>
-                <!-- coupler -->
-                <rect x="38" y="76" width="14" height="10" rx="2" fill="#8b949e"/>
-                <!-- locomotive -->
-                <rect x="16" y="84" width="58" height="86" rx="12" fill="#1e242c" stroke="#e8eef4" stroke-width="2.8"/>
-                <rect x="24" y="96" width="16" height="18" rx="3" fill="#93c5fd"/>
-                <rect x="50" y="96" width="16" height="18" rx="3" fill="#93c5fd"/>
-                <rect x="24" y="122" width="42" height="7" rx="2" fill="#3b82f6"/>
-                <rect x="24" y="134" width="42" height="7" rx="2" fill="#3b82f6"/>
-                <!-- nose / headlight at the front (bottom) -->
-                <rect x="22" y="154" width="46" height="22" rx="11" fill="#2a313c" stroke="#e8eef4" stroke-width="2"/>
-                <circle cx="45" cy="176" r="16" fill="#eff6ff"/>
-                <circle cx="45" cy="176" r="12" fill="#60a5fa"/>
-                <circle cx="45" cy="176" r="7" fill="#ffffff"/>
-                <circle cx="41" cy="172" r="2.4" fill="#fff"/>
+                <rect x="38" y="80" width="14" height="10" rx="2" fill="#8b949e"/>
+
+                <rect x="16" y="94" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="106" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="106" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="130" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="130" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="22" y="154" width="46" height="6" rx="2" fill="#3b82f6"/>
+                <rect x="38" y="170" width="14" height="10" rx="2" fill="#8b949e"/>
+
+                <rect x="16" y="184" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="196" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="196" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="220" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="220" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="22" y="244" width="46" height="6" rx="2" fill="#3b82f6"/>
+                <rect x="38" y="260" width="14" height="10" rx="2" fill="#8b949e"/>
+
+                <rect x="16" y="274" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="286" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="286" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="310" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="310" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="22" y="334" width="46" height="6" rx="2" fill="#3b82f6"/>
+                <rect x="38" y="350" width="14" height="10" rx="2" fill="#8b949e"/>
+
+                <rect x="16" y="364" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="376" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="376" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="400" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="400" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="22" y="424" width="46" height="6" rx="2" fill="#3b82f6"/>
+                <rect x="38" y="440" width="14" height="10" rx="2" fill="#8b949e"/>
+
+                <rect x="16" y="454" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="466" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="466" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="490" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="490" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="22" y="514" width="46" height="6" rx="2" fill="#3b82f6"/>
+                <rect x="38" y="530" width="14" height="10" rx="2" fill="#8b949e"/>
+                <!-- locomotive (front, at the bottom, toward the crossing) -->
+                <rect x="14" y="548" width="62" height="112" rx="13" fill="#1e242c" stroke="#e8eef4" stroke-width="2.8"/>
+                <rect x="24" y="562" width="18" height="20" rx="3" fill="#93c5fd"/>
+                <rect x="48" y="562" width="18" height="20" rx="3" fill="#93c5fd"/>
+                <rect x="24" y="592" width="42" height="7" rx="2" fill="#3b82f6"/>
+                <rect x="24" y="606" width="42" height="7" rx="2" fill="#3b82f6"/>
+                <rect x="20" y="648" width="50" height="28" rx="12" fill="#2a313c" stroke="#e8eef4" stroke-width="2.2"/>
+                <ellipse cx="45" cy="704" rx="32" ry="36" fill="url(#beam0)"/>
+                <circle cx="45" cy="690" r="18" fill="#eff6ff"/>
+                <circle cx="45" cy="690" r="13" fill="#60a5fa"/>
+                <circle cx="45" cy="690" r="7" fill="#ffffff"/>
+                <circle cx="41" cy="686" r="2.6" fill="#fff"/>
               </svg>
             </div>
           <div class="train" id="train1" aria-hidden="true">
-              <svg viewBox="0 0 90 200" overflow="visible">
+              <svg viewBox="0 0 90 720" overflow="visible" preserveAspectRatio="xMidYMid meet">
                 <defs>
-                  <radialGradient id="beam1" cx="50%" cy="18%" r="80%">
+                  <radialGradient id="beam1" cx="50%" cy="20%" r="80%">
                     <stop offset="0%" stop-color="#dbeafe" stop-opacity="0.95"/>
-                    <stop offset="35%" stop-color="#60a5fa" stop-opacity="0.45"/>
+                    <stop offset="40%" stop-color="#60a5fa" stop-opacity="0.4"/>
                     <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
                   </radialGradient>
                 </defs>
-                <!-- soft headlight glow toward the mole (down the track) -->
-                <ellipse cx="45" cy="188" rx="34" ry="40" fill="url(#beam1)"/>
-                <!-- rear carriage -->
-                <rect x="18" y="8" width="54" height="70" rx="10" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
-                <rect x="24" y="18" width="18" height="16" rx="3" fill="#7dd3fc"/>
-                <rect x="48" y="18" width="18" height="16" rx="3" fill="#7dd3fc"/>
-                <rect x="24" y="42" width="18" height="16" rx="3" fill="#7dd3fc"/>
-                <rect x="48" y="42" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                
+                <rect x="16" y="4" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="16" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="16" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="40" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="40" width="18" height="16" rx="3" fill="#7dd3fc"/>
                 <rect x="22" y="64" width="46" height="6" rx="2" fill="#3b82f6"/>
-                <!-- coupler -->
-                <rect x="38" y="76" width="14" height="10" rx="2" fill="#8b949e"/>
-                <!-- locomotive -->
-                <rect x="16" y="84" width="58" height="86" rx="12" fill="#1e242c" stroke="#e8eef4" stroke-width="2.8"/>
-                <rect x="24" y="96" width="16" height="18" rx="3" fill="#93c5fd"/>
-                <rect x="50" y="96" width="16" height="18" rx="3" fill="#93c5fd"/>
-                <rect x="24" y="122" width="42" height="7" rx="2" fill="#3b82f6"/>
-                <rect x="24" y="134" width="42" height="7" rx="2" fill="#3b82f6"/>
-                <!-- nose / headlight at the front (bottom) -->
-                <rect x="22" y="154" width="46" height="22" rx="11" fill="#2a313c" stroke="#e8eef4" stroke-width="2"/>
-                <circle cx="45" cy="176" r="16" fill="#eff6ff"/>
-                <circle cx="45" cy="176" r="12" fill="#60a5fa"/>
-                <circle cx="45" cy="176" r="7" fill="#ffffff"/>
-                <circle cx="41" cy="172" r="2.4" fill="#fff"/>
+                <rect x="38" y="80" width="14" height="10" rx="2" fill="#8b949e"/>
+
+                <rect x="16" y="94" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="106" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="106" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="130" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="130" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="22" y="154" width="46" height="6" rx="2" fill="#3b82f6"/>
+                <rect x="38" y="170" width="14" height="10" rx="2" fill="#8b949e"/>
+
+                <rect x="16" y="184" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="196" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="196" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="220" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="220" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="22" y="244" width="46" height="6" rx="2" fill="#3b82f6"/>
+                <rect x="38" y="260" width="14" height="10" rx="2" fill="#8b949e"/>
+
+                <rect x="16" y="274" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="286" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="286" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="310" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="310" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="22" y="334" width="46" height="6" rx="2" fill="#3b82f6"/>
+                <rect x="38" y="350" width="14" height="10" rx="2" fill="#8b949e"/>
+
+                <rect x="16" y="364" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="376" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="376" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="400" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="400" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="22" y="424" width="46" height="6" rx="2" fill="#3b82f6"/>
+                <rect x="38" y="440" width="14" height="10" rx="2" fill="#8b949e"/>
+
+                <rect x="16" y="454" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="466" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="466" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="490" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="490" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="22" y="514" width="46" height="6" rx="2" fill="#3b82f6"/>
+                <rect x="38" y="530" width="14" height="10" rx="2" fill="#8b949e"/>
+                <!-- locomotive (front, at the bottom, toward the crossing) -->
+                <rect x="14" y="548" width="62" height="112" rx="13" fill="#1e242c" stroke="#e8eef4" stroke-width="2.8"/>
+                <rect x="24" y="562" width="18" height="20" rx="3" fill="#93c5fd"/>
+                <rect x="48" y="562" width="18" height="20" rx="3" fill="#93c5fd"/>
+                <rect x="24" y="592" width="42" height="7" rx="2" fill="#3b82f6"/>
+                <rect x="24" y="606" width="42" height="7" rx="2" fill="#3b82f6"/>
+                <rect x="20" y="648" width="50" height="28" rx="12" fill="#2a313c" stroke="#e8eef4" stroke-width="2.2"/>
+                <ellipse cx="45" cy="704" rx="32" ry="36" fill="url(#beam1)"/>
+                <circle cx="45" cy="690" r="18" fill="#eff6ff"/>
+                <circle cx="45" cy="690" r="13" fill="#60a5fa"/>
+                <circle cx="45" cy="690" r="7" fill="#ffffff"/>
+                <circle cx="41" cy="686" r="2.6" fill="#fff"/>
               </svg>
             </div>
           <div class="train" id="train2" aria-hidden="true">
-              <svg viewBox="0 0 90 200" overflow="visible">
+              <svg viewBox="0 0 90 720" overflow="visible" preserveAspectRatio="xMidYMid meet">
                 <defs>
-                  <radialGradient id="beam2" cx="50%" cy="18%" r="80%">
+                  <radialGradient id="beam2" cx="50%" cy="20%" r="80%">
                     <stop offset="0%" stop-color="#dbeafe" stop-opacity="0.95"/>
-                    <stop offset="35%" stop-color="#60a5fa" stop-opacity="0.45"/>
+                    <stop offset="40%" stop-color="#60a5fa" stop-opacity="0.4"/>
                     <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
                   </radialGradient>
                 </defs>
-                <!-- soft headlight glow toward the mole (down the track) -->
-                <ellipse cx="45" cy="188" rx="34" ry="40" fill="url(#beam2)"/>
-                <!-- rear carriage -->
-                <rect x="18" y="8" width="54" height="70" rx="10" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
-                <rect x="24" y="18" width="18" height="16" rx="3" fill="#7dd3fc"/>
-                <rect x="48" y="18" width="18" height="16" rx="3" fill="#7dd3fc"/>
-                <rect x="24" y="42" width="18" height="16" rx="3" fill="#7dd3fc"/>
-                <rect x="48" y="42" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                
+                <rect x="16" y="4" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="16" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="16" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="40" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="40" width="18" height="16" rx="3" fill="#7dd3fc"/>
                 <rect x="22" y="64" width="46" height="6" rx="2" fill="#3b82f6"/>
-                <!-- coupler -->
-                <rect x="38" y="76" width="14" height="10" rx="2" fill="#8b949e"/>
-                <!-- locomotive -->
-                <rect x="16" y="84" width="58" height="86" rx="12" fill="#1e242c" stroke="#e8eef4" stroke-width="2.8"/>
-                <rect x="24" y="96" width="16" height="18" rx="3" fill="#93c5fd"/>
-                <rect x="50" y="96" width="16" height="18" rx="3" fill="#93c5fd"/>
-                <rect x="24" y="122" width="42" height="7" rx="2" fill="#3b82f6"/>
-                <rect x="24" y="134" width="42" height="7" rx="2" fill="#3b82f6"/>
-                <!-- nose / headlight at the front (bottom) -->
-                <rect x="22" y="154" width="46" height="22" rx="11" fill="#2a313c" stroke="#e8eef4" stroke-width="2"/>
-                <circle cx="45" cy="176" r="16" fill="#eff6ff"/>
-                <circle cx="45" cy="176" r="12" fill="#60a5fa"/>
-                <circle cx="45" cy="176" r="7" fill="#ffffff"/>
-                <circle cx="41" cy="172" r="2.4" fill="#fff"/>
+                <rect x="38" y="80" width="14" height="10" rx="2" fill="#8b949e"/>
+
+                <rect x="16" y="94" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="106" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="106" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="130" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="130" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="22" y="154" width="46" height="6" rx="2" fill="#3b82f6"/>
+                <rect x="38" y="170" width="14" height="10" rx="2" fill="#8b949e"/>
+
+                <rect x="16" y="184" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="196" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="196" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="220" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="220" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="22" y="244" width="46" height="6" rx="2" fill="#3b82f6"/>
+                <rect x="38" y="260" width="14" height="10" rx="2" fill="#8b949e"/>
+
+                <rect x="16" y="274" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="286" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="286" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="310" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="310" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="22" y="334" width="46" height="6" rx="2" fill="#3b82f6"/>
+                <rect x="38" y="350" width="14" height="10" rx="2" fill="#8b949e"/>
+
+                <rect x="16" y="364" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="376" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="376" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="400" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="400" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="22" y="424" width="46" height="6" rx="2" fill="#3b82f6"/>
+                <rect x="38" y="440" width="14" height="10" rx="2" fill="#8b949e"/>
+
+                <rect x="16" y="454" width="58" height="76" rx="11" fill="#252b34" stroke="#d5dee8" stroke-width="2.6"/>
+                <rect x="24" y="466" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="466" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="24" y="490" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="48" y="490" width="18" height="16" rx="3" fill="#7dd3fc"/>
+                <rect x="22" y="514" width="46" height="6" rx="2" fill="#3b82f6"/>
+                <rect x="38" y="530" width="14" height="10" rx="2" fill="#8b949e"/>
+                <!-- locomotive (front, at the bottom, toward the crossing) -->
+                <rect x="14" y="548" width="62" height="112" rx="13" fill="#1e242c" stroke="#e8eef4" stroke-width="2.8"/>
+                <rect x="24" y="562" width="18" height="20" rx="3" fill="#93c5fd"/>
+                <rect x="48" y="562" width="18" height="20" rx="3" fill="#93c5fd"/>
+                <rect x="24" y="592" width="42" height="7" rx="2" fill="#3b82f6"/>
+                <rect x="24" y="606" width="42" height="7" rx="2" fill="#3b82f6"/>
+                <rect x="20" y="648" width="50" height="28" rx="12" fill="#2a313c" stroke="#e8eef4" stroke-width="2.2"/>
+                <ellipse cx="45" cy="704" rx="32" ry="36" fill="url(#beam2)"/>
+                <circle cx="45" cy="690" r="18" fill="#eff6ff"/>
+                <circle cx="45" cy="690" r="13" fill="#60a5fa"/>
+                <circle cx="45" cy="690" r="7" fill="#ffffff"/>
+                <circle cx="41" cy="686" r="2.6" fill="#fff"/>
               </svg>
             </div>
-          <div class="mole" id="mole" aria-hidden="true">
-              <svg viewBox="0 0 78 86">
-                <ellipse cx="39" cy="76" rx="20" ry="6" fill="rgba(0,0,0,0.35)"/>
-                <g class="stars" transform-origin="39 16">
-                  <text x="4" y="16" font-size="11" fill="#93c5fd">✦</text>
-                  <text x="60" y="14" font-size="10" fill="#bfdbfe">✧</text>
-                  <text x="32" y="6" font-size="11" fill="#93c5fd">✦</text>
+          <div class="chicken" id="chicken" aria-hidden="true">
+              <svg viewBox="0 0 84 90">
+                <ellipse cx="42" cy="82" rx="18" ry="6" fill="rgba(0,0,0,0.35)"/>
+                <g class="stars" transform-origin="42 16">
+                  <text x="6" y="14" font-size="11" fill="#fde68a">✦</text>
+                  <text x="62" y="12" font-size="10" fill="#fde68a">✧</text>
+                  <text x="34" y="5" font-size="11" fill="#fde68a">✦</text>
                 </g>
                 <g class="body">
-                  <ellipse cx="39" cy="50" rx="24" ry="26" fill="#6b4a36"/>
-                  <ellipse cx="39" cy="50" rx="24" ry="26" fill="none" stroke="#3a281c" stroke-width="2"/>
-                  <ellipse cx="39" cy="54" rx="12" ry="11" fill="#c4a07a"/>
-                  <ellipse cx="20" cy="66" rx="8" ry="6" fill="#4a3224"/>
-                  <ellipse cx="58" cy="66" rx="8" ry="6" fill="#4a3224"/>
-                  <path d="M16 68 l-4 5 M20 70 l0 6 M24 68 l4 5" stroke="#e8c4b0" stroke-width="1.7" stroke-linecap="round"/>
-                  <path d="M54 68 l-4 5 M58 70 l0 6 M62 68 l4 5" stroke="#e8c4b0" stroke-width="1.7" stroke-linecap="round"/>
-                  <ellipse cx="18" cy="36" rx="7" ry="6" fill="#4a3224"/>
-                  <ellipse cx="60" cy="36" rx="7" ry="6" fill="#4a3224"/>
-                  <path d="M14 33 l-5 -4 M17 32 l-1 -6 M22 33 l4 -5" stroke="#e8c4b0" stroke-width="1.7" stroke-linecap="round"/>
-                  <path d="M64 33 l5 -4 M61 32 l1 -6 M56 33 l-4 -5" stroke="#e8c4b0" stroke-width="1.7" stroke-linecap="round"/>
-                  <ellipse cx="39" cy="76" rx="4" ry="3" fill="#4a3224"/>
-                  <ellipse cx="39" cy="28" rx="18" ry="16" fill="#7a5640"/>
-                  <ellipse cx="39" cy="28" rx="18" ry="16" fill="none" stroke="#3a281c" stroke-width="2"/>
-                  <ellipse cx="26" cy="18" rx="6" ry="7" fill="#4a3224"/>
-                  <ellipse cx="52" cy="18" rx="6" ry="7" fill="#4a3224"/>
-                  <ellipse cx="26" cy="19" rx="3" ry="4" fill="#e8a8b8"/>
-                  <ellipse cx="52" cy="19" rx="3" ry="4" fill="#e8a8b8"/>
+                  <!-- tail toward the sidewalk (bottom) -->
+                  <ellipse cx="30" cy="70" rx="8" ry="14" fill="#e39b22" transform="rotate(-20 30 70)"/>
+                  <ellipse cx="42" cy="74" rx="8" ry="15" fill="#f0b040"/>
+                  <ellipse cx="54" cy="70" rx="8" ry="14" fill="#e39b22" transform="rotate(20 54 70)"/>
+                  <!-- body -->
+                  <ellipse cx="42" cy="50" rx="26" ry="23" fill="#f3c43a"/>
+                  <ellipse cx="42" cy="50" rx="26" ry="23" fill="none" stroke="#c48a18" stroke-width="2"/>
+                  <ellipse cx="42" cy="54" rx="13" ry="11" fill="#fbe8a0"/>
+                  <!-- wings -->
+                  <ellipse cx="16" cy="52" rx="10" ry="13" fill="#e8a028" stroke="#c48a18" stroke-width="1.6"/>
+                  <ellipse cx="68" cy="52" rx="10" ry="13" fill="#e8a028" stroke="#c48a18" stroke-width="1.6"/>
+                  <path d="M12 48 q4 4 0 10" fill="none" stroke="#c48a18" stroke-width="1.2"/>
+                  <path d="M72 48 q-4 4 0 10" fill="none" stroke="#c48a18" stroke-width="1.2"/>
+                  <!-- feet -->
+                  <path d="M28 70 l-6 7 M32 71 l0 8 M36 70 l5 6" stroke="#e88930" stroke-width="1.8" stroke-linecap="round"/>
+                  <path d="M56 70 l6 7 M52 71 l0 8 M48 70 l-5 6" stroke="#e88930" stroke-width="1.8" stroke-linecap="round"/>
+                  <!-- head, facing the tunnels (up) -->
+                  <ellipse cx="42" cy="24" rx="16" ry="15" fill="#f6cc4a" stroke="#c48a18" stroke-width="2"/>
+                  <path d="M34 14 q4 -11 8 -1 q3 -9 8 1 q2 -6 7 3" fill="#e4453a"/>
+                  <polygon points="42,5 36,14 48,14" fill="#f08c28"/>
+                  <polygon points="42,7 39,13 45,13" fill="#f6a322"/>
                   <g class="eyes-ok">
-                    <ellipse cx="31" cy="26" rx="4.2" ry="4.6" fill="#fff"/>
-                    <ellipse cx="47" cy="26" rx="4.2" ry="4.6" fill="#fff"/>
-                    <circle cx="31.5" cy="27" r="2" fill="#1a1410"/>
-                    <circle cx="47.5" cy="27" r="2" fill="#1a1410"/>
-                    <circle cx="30.5" cy="25.5" r="0.8" fill="#fff"/>
-                    <circle cx="46.5" cy="25.5" r="0.8" fill="#fff"/>
+                    <ellipse cx="36" cy="25" rx="4.2" ry="4.6" fill="#fff"/>
+                    <ellipse cx="48" cy="25" rx="4.2" ry="4.6" fill="#fff"/>
+                    <circle cx="36.4" cy="26" r="2" fill="#1a1410"/>
+                    <circle cx="48.4" cy="26" r="2" fill="#1a1410"/>
+                    <circle cx="35.4" cy="24.5" r="0.8" fill="#fff"/>
+                    <circle cx="47.4" cy="24.5" r="0.8" fill="#fff"/>
                   </g>
                   <g class="eyes-hit">
-                    <path d="M28 23 l6 6 M34 23 l-6 6" stroke="#1a1410" stroke-width="1.8" stroke-linecap="round"/>
-                    <path d="M44 23 l6 6 M50 23 l-6 6" stroke="#1a1410" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M33 22 l6 6 M39 22 l-6 6" stroke="#1a1410" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M45 22 l6 6 M51 22 l-6 6" stroke="#1a1410" stroke-width="1.8" stroke-linecap="round"/>
                   </g>
-                  <ellipse cx="39" cy="36" rx="6.5" ry="5.5" fill="#f3a8b8"/>
-                  <ellipse cx="39" cy="34.5" rx="2.4" ry="2" fill="#c45a72"/>
                 </g>
               </svg>
             </div>
@@ -908,8 +1021,9 @@
         <summary>How to play</summary>
         <p>
           This is fake money &mdash; you start with $1,000. Place a bet, then tap one of the three tracks.
-          A train comes down a random track from the tunnels. If it isn&rsquo;t yours, you move up and the multiplier climbs
-          (1.46× each clear). Cash out whenever you like, or keep going. Get hit and the bet is gone.
+          A train comes down a random track from the tunnels. If it isn&rsquo;t yours, you clear the pass and the multiplier climbs
+          (1.46× each clear). Your chicken stays on the crossing and only steps sideways when you pick a track.
+          Cash out whenever you like, or keep going. Get hit and the bet is gone.
           There is a small house edge, about 3% per clear. Auto mode can cash out after a set number of clears.
         </p>
       </details>
@@ -937,17 +1051,16 @@
     var STORAGE_KEY = "train-game-v4";
     var LEGACY_KEYS = ["train-game-v2", "train-game-v1"];
     var HISTORY_MAX = 8;
-    var STEPS = 8;
+    var MAX_CLEARS = 30;
     var TRACK_X = [22, 50, 78];
-    var SIDEWALK_Y = 92;
+    var CHICKEN_Y = 78;
     var TUNNEL_Y = 11;
-    var FIRST_Y = 80;
-    var LAST_Y = 24;
+    var PASS_Y = 118;
 
     var DELAYS = {
       walk: 320,
       rumble: 900,
-      burst: 700,
+      burst: 1100,
       hit: 1000,
       flourish: 480,
       result: 600
@@ -958,12 +1071,6 @@
       return Math.pow(STEP_MULT, rounds);
     }
     function trackX(i) { return TRACK_X[i]; }
-    function stepY(step) {
-      if (step <= 0) return SIDEWALK_Y;
-      var s = Math.min(STEPS, step);
-      if (STEPS === 1) return FIRST_Y;
-      return FIRST_Y + (LAST_Y - FIRST_Y) * ((s - 1) / (STEPS - 1));
-    }
 
     var state = {
       balanceCents: STARTING_CENTS,
@@ -991,7 +1098,7 @@
     var yardView = document.getElementById("yardView");
     var hitsEl = document.getElementById("hits");
     var padsEl = document.getElementById("pads");
-    var mole = document.getElementById("mole");
+    var chicken = document.getElementById("chicken");
     var trains = [
       document.getElementById("train0"),
       document.getElementById("train1"),
@@ -1015,6 +1122,10 @@
     var profitBox = document.getElementById("profitBox");
     var profitRead = document.getElementById("profitRead");
     var profitMult = document.getElementById("profitMult");
+    var clearRead = document.getElementById("clearRead");
+    var curMult = document.getElementById("curMult");
+    var curMultBox = document.getElementById("curMultBox");
+    var nextMult = document.getElementById("nextMult");
 
     function fmtMoney(cents) {
       var sign = cents < 0 ? "-" : "";
@@ -1075,21 +1186,15 @@
       app.className = "app is-" + phase + (state.autoMode ? " is-auto" : "");
     }
 
-    function placeMole(track, step, instant) {
-      var x, y;
-      if (track == null || track < 0) {
-        x = 50;
-        y = SIDEWALK_Y;
-      } else {
-        x = trackX(track);
-        y = stepY(step == null ? state.round : step);
-      }
-      if (instant) mole.style.transitionDuration = "0s";
-      mole.style.left = x + "%";
-      mole.style.top = y + "%";
+    function placeChicken(track, instant) {
+      var x = (track == null || track < 0) ? 50 : trackX(track);
+      var y = CHICKEN_Y;
+      if (instant) chicken.style.transitionDuration = "0s";
+      chicken.style.left = x + "%";
+      chicken.style.top = y + "%";
       if (instant) {
-        mole.offsetHeight;
-        mole.style.transitionDuration = "";
+        chicken.offsetHeight;
+        chicken.style.transitionDuration = "";
       }
     }
 
@@ -1099,7 +1204,7 @@
         trains[i].style.opacity = "0";
         trains[i].style.left = trackX(i) + "%";
         trains[i].style.top = TUNNEL_Y + "%";
-        trains[i].style.transform = "scale(0.85)";
+        trains[i].style.transform = "translateY(-100%)";
         if (trains[i].getAnimations) {
           trains[i].getAnimations().forEach(function (a) { a.cancel(); });
         }
@@ -1109,26 +1214,25 @@
     function runTrain(track, kind, duration) {
       var el = trains[track];
       var startY = TUNNEL_Y;
-      var endY = kind === "hit" ? stepY(state.round) - 1 : 96;
-      var startS = 0.9;
-      var endS = kind === "hit" ? 1.15 : 1.25;
+      var endY = kind === "hit" ? CHICKEN_Y + 2 : PASS_Y;
       el.className = "train is-" + (kind === "hit" ? "impact" : kind === "pass" ? "passing" : "bursting");
       el.style.zIndex = "9";
       el.style.opacity = "1";
       el.style.left = trackX(track) + "%";
+      var t0 = "translateY(-100%)";
       if (el.animate) {
         el.animate(
           [
-            { top: startY + "%", transform: "scale(" + startS + ")", opacity: 1 },
-            { top: (startY + endY) / 2 + "%", transform: "scale(" + ((startS + endS) / 2) + ")", opacity: 1, offset: 0.55 },
-            { top: endY + "%", transform: "scale(" + endS + ")", opacity: kind === "pass" ? 0 : 1 }
+            { top: startY + "%", transform: t0, opacity: 1 },
+            { top: (startY + endY) / 2 + "%", transform: t0, opacity: 1, offset: 0.5 },
+            { top: endY + "%", transform: t0, opacity: 1 }
           ],
           { duration: duration, easing: "cubic-bezier(0.22, 0.7, 0.25, 1)", fill: "forwards" }
         );
       } else {
         el.style.top = endY + "%";
-        el.style.transform = "scale(" + endS + ")";
-        el.style.opacity = kind === "pass" ? "0" : "1";
+        el.style.transform = t0;
+        el.style.opacity = "1";
       }
     }
 
@@ -1140,7 +1244,8 @@
       el.style.opacity = "1";
       el.style.left = trackX(track) + "%";
       el.style.top = yPct + "%";
-      el.style.transform = "scale(" + (scale == null ? 1.1 : scale) + ")";
+      var sc = scale == null ? 1 : scale;
+      el.style.transform = "translateY(-100%)" + (sc === 1 ? "" : " scale(" + sc + ")");
     }
 
     function clearMarks() {
@@ -1156,20 +1261,21 @@
     }
 
     function paintPads() {
-      var pads = padsEl.querySelectorAll(".pad, .pill");
-      var next = state.phase === "idle" && !state.betCents ? 1 : Math.min(STEPS, state.round + 1);
+      var pads = padsEl.querySelectorAll(".pad");
       for (var i = 0; i < pads.length; i++) {
         var el = pads[i];
-        var step = Number(el.getAttribute("data-step"));
         var track = Number(el.getAttribute("data-track"));
-        el.classList.remove("is-next", "is-done", "is-here");
-        if (el.classList.contains("pill")) el.textContent = fmtMult(multAfter(step));
-        if (step < next && state.round >= step) el.classList.add("is-done");
-        if (state.round >= step && track === state.chosen && step === state.round) el.classList.add("is-here");
-        if (step === next && (state.phase === "pick" || state.phase === "commit" || state.phase === "rumble" || state.phase === "burst" || state.phase === "safe" || (state.phase === "idle" && !state.betCents))) {
-          el.classList.add("is-next");
-        }
+        el.classList.toggle("is-here", state.chosen != null && track === state.chosen && state.phase !== "idle");
       }
+    }
+
+    function paintHud() {
+      var clears = state.betCents ? state.round : 0;
+      var cur = state.betCents ? state.multiplier : 1;
+      clearRead.textContent = String(clears);
+      curMult.textContent = fmtMult(cur);
+      nextMult.textContent = fmtMult(multAfter(clears + 1));
+      curMultBox.classList.toggle("has-run", !!(state.betCents && state.round > 0));
     }
 
     function currentBetCents() {
@@ -1275,9 +1381,10 @@
         }).join("");
       }
       paintPads();
+      paintHud();
     }
 
-    function renderRide() { paintPads(); }
+    function renderRide() { paintPads(); paintHud(); }
 
     function setStatus(text) { statusLine.textContent = text; }
     function showResult(text, win) {
@@ -1385,7 +1492,7 @@
       save();
       flashBalance("down");
       clearMarks();
-      placeMole(null, 0, false);
+      placeChicken(null, false);
       setPhase("pick");
       setStatus("Pick a track");
       renderStatic();
@@ -1408,7 +1515,7 @@
       setPhase("commit");
       setStatus("Committing to track " + (index + 1) + "\u2026");
       sfx.step();
-      placeMole(index, state.round, false);
+      placeChicken(index, false);
       renderStatic();
       renderRide();
       later(DELAYS.walk, beginRumble);
@@ -1452,7 +1559,7 @@
       setPhase("safe");
       sfx.pass();
       later(60, sfx.clear);
-      placeMole(state.chosen, state.round, false);
+      placeChicken(state.chosen, false);
       setStatus("Clear! Multiplier " + fmtMult(state.multiplier));
       showResult("Clear  \u00b7  " + fmtMult(state.multiplier), true);
       renderStatic();
@@ -1461,7 +1568,7 @@
         later(Math.min(DELAYS.flourish, 280), function () { cashOut(); });
         return;
       }
-      if (state.round >= STEPS) {
+      if (state.round >= MAX_CLEARS) {
         later(Math.min(DELAYS.flourish, 400), function () { cashOut(); });
         return;
       }
@@ -1529,7 +1636,7 @@
       state.payoutCents = 0;
       hideResult();
       clearMarks();
-      placeMole(null, 0, false);
+      placeChicken(null, false);
       if (state.balanceCents < MIN_BET_CENTS) setStatus("Out of cash");
       else setStatus("Waiting at the platform");
       renderStatic();
@@ -1551,7 +1658,7 @@
       save();
       setPhase("idle");
       clearMarks();
-      placeMole(null, 0, true);
+      placeChicken(null, true);
       setStatus("Bankroll reset \u2014 waiting at the platform");
       if (Number(betInput.value) * 100 > state.balanceCents || !betInput.value) betInput.value = "50";
       renderStatic();
@@ -1646,7 +1753,7 @@
     if (Number(betInput.value) * 100 > state.balanceCents && state.balanceCents >= MIN_BET_CENTS) {
       betInput.value = String(Math.floor(state.balanceCents / 100));
     }
-    placeMole(null, 0, true);
+    placeChicken(null, true);
     setPhase("idle");
     setStatus(state.balanceCents < MIN_BET_CENTS ? "Out of cash" : "Waiting at the platform");
     renderStatic();
@@ -1669,7 +1776,8 @@
           autoClear: state.autoClear,
           autoMode: state.autoMode,
           stepMult: STEP_MULT,
-          version: "tunnels-v4-slate"
+          chickenY: CHICKEN_Y,
+          version: "tunnels-v5-chicken"
         };
       },
       setBalance: function (dollars) {
@@ -1717,7 +1825,7 @@
         state.trainTrack = null;
         clearMarks();
         markChosen(state.chosen);
-        placeMole(state.chosen, state.round, true);
+        placeChicken(state.chosen, true);
         var mode = opts.mode || "rumble";
         if (mode === "pick" || mode === "safe") {
           setPhase(mode === "safe" ? "safe" : "pick");
